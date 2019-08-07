@@ -30,4 +30,7 @@ $api->version('v1', [
     ]);
 
     $api->resources([ 'test' => 'TestController' ]);
+    $api->resources([ 'framwork' => 'FramworkController' ]);
+    $api->resources([ 'framworkdetails' => 'FramworkdetailsController' ]);
+    $api->resources([ 'supplier' => 'SupplierController' ]);
 });
