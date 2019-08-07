@@ -28,4 +28,6 @@ $api->version('v1', [
         'as' => 'attendance.index',
         'uses' => 'AttendanceController@index',
     ]);
+
+    $api->resources([ 'test' => 'TestController' ]);
 });

@@ -36,7 +36,7 @@ abstract class AbstractEloquentRepository implements BaseRepository
     public function __construct(Model $model)
     {
         $this->model = $model;
-        $this->loggedInUser = $this->getLoggedInUser();
+        //$this->loggedInUser = $this->getLoggedInUser();
     }
 
     /**
@@ -54,7 +54,7 @@ abstract class AbstractEloquentRepository implements BaseRepository
      */
     public function findOne($id)
     {
-        return $this->findOneBy(['uid' => $id]);
+        return $this->findOneBy(['id' => $id]);
     }
 
     /**
@@ -119,7 +119,7 @@ abstract class AbstractEloquentRepository implements BaseRepository
     public function save(array $data)
     {
         // generate uid
-        $data['uid'] = Uuid::uuid4();
+        $data['id'] = Uuid::uuid4();
 
         return $this->model->create($data);
     }
@@ -143,7 +143,7 @@ abstract class AbstractEloquentRepository implements BaseRepository
         $model->save();
 
         // get updated model from database
-        $model = $this->findOne($model->uid);
+        $model = $this->findOne($model->id);
 
         return $model;
     }

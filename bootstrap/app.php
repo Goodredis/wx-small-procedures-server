@@ -104,6 +104,7 @@ $app->register(App\Providers\RepositoriesServiceProvider::class);
 $app->register(Barryvdh\Cors\ServiceProvider::class);
 $app->register(\Illuminate\Mail\MailServiceProvider::class);
 
+//$app->register(Dingo\Api\Provider\LaravelServiceProvider::class);
 $app->register(Dingo\Api\Provider\LumenServiceProvider::class);
 // LumenPassport::routes($app);
 

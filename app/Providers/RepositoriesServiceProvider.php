@@ -3,9 +3,12 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\Models\Test;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\Contracts\UserRepository;
+use App\Repositories\Contracts\TestRepository;
 use App\Repositories\EloquentUserRepository;
+use App\Repositories\EloquentTestRepository;
 
 class RepositoriesServiceProvider extends ServiceProvider
 {
@@ -26,6 +29,9 @@ class RepositoriesServiceProvider extends ServiceProvider
         $this->app->bind(UserRepository::class, function () {
             return new EloquentUserRepository(new User());
         });
+        $this->app->bind(TestRepository::class, function () {
+            return new EloquentTestRepository(new Test());
+        });
     }
 
     /**
@@ -36,7 +42,8 @@ class RepositoriesServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            UserRepository::class
+            UserRepository::class,
+            TestRepository::class
         ];
     }
 }
