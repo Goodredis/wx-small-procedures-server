@@ -23,13 +23,8 @@ $api->version('v1', [
     'limit' => 20, 'expires' => 1,
 ], function ($api) {
     // Auth
-    // login
-    $api->get('attendance', [
-        'as' => 'attendance.index',
-        'uses' => 'AttendanceController@index',
-    ]);
-
     $api->resources([ 'test' => 'TestController' ]);
+    $api->resources([ 'attendance' => 'AttendanceController' ]);
     $api->resources([ 'framwork' => 'FramworkController' ]);
     $api->resources([ 'framworkdetails' => 'FramworkdetailsController' ]);
     $api->resources([ 'supplier' => 'SupplierController' ]);

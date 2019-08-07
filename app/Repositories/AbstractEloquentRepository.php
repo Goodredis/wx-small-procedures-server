@@ -116,10 +116,10 @@ abstract class AbstractEloquentRepository implements BaseRepository
     /**
      * @inheritdoc
      */
-    public function save(array $data)
+    public function save(array $data, $generateUidFlag = true)
     {
         // generate uid
-        $data['id'] = Uuid::uuid4();
+        if($generateUidFlag === true) $data['id'] = Uuid::uuid4();
 
         return $this->model->create($data);
     }
