@@ -68,15 +68,15 @@ abstract class AbstractEloquentRepository implements BaseRepository
     /**
      * @inheritdoc
      */
-    public function findBy(array $searchCriteria = [])
+    public function findBy(array $searchCriteria = [], $operatorCriteria = [], $orderCriteria = 'created_at')
     {
         $limit = !empty($searchCriteria['per_page']) ? (int)$searchCriteria['per_page'] : 15; // it's needed for pagination
 
         $queryBuilder = $this->model->where(function ($query) use ($searchCriteria) {
 
-            $this->applySearchCriteriaInQueryBuilder($query, $searchCriteria);
+            $this->applySearchCriteriaInQueryBuilder($query, $searchCriteria, $operatorCriteria);
         }
-        );
+        )->orderByRaw($orderCriteria);
 
         return $queryBuilder->paginate($limit);
     }
@@ -89,7 +89,7 @@ abstract class AbstractEloquentRepository implements BaseRepository
      * @param array $searchCriteria
      * @return mixed
      */
-    protected function applySearchCriteriaInQueryBuilder($queryBuilder, array $searchCriteria = [])
+    protected function applySearchCriteriaInQueryBuilder($queryBuilder, array $searchCriteria = [], array $operatorCriteria = [])
     {
 
         foreach ($searchCriteria as $key => $value) {
@@ -105,7 +105,7 @@ abstract class AbstractEloquentRepository implements BaseRepository
             if (count($allValues) > 1) {
                 $queryBuilder->whereIn($key, $allValues);
             } else {
-                $operator = '=';
+                $operator = $operatorCriteria[$key];
                 $queryBuilder->where($key, $operator, $value);
             }
         }

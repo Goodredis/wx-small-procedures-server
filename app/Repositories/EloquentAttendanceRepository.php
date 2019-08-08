@@ -30,8 +30,8 @@ class EloquentAttendanceRepository extends AbstractEloquentRepository implements
 	/**
      * @inheritdoc
      */
-    public function findBy(array $searchCriteria = []) {
-        return parent::findBy($searchCriteria);
+    public function findBy(array $searchCriteria = [], $operatorCriteria = [], $orderCriteria = 'created_at') {
+        return parent::findBy($searchCriteria, $operatorCriteria, $orderCriteria);
     }
 
     /**
