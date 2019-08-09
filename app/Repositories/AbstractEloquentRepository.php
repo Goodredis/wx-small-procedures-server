@@ -165,10 +165,23 @@ abstract class AbstractEloquentRepository implements BaseRepository
 
     /**
      * @inheritdoc
+     * @param bool $del
+     * 如果为true就是物理删除即真正的删除，
+     * 如果为false则是逻辑删除即将del_flag置为1
      */
-    public function delete(Model $model)
-    {
-        return $model->delete();
+    public function delete(Model $model, $del=true){
+        return $model->delete($del);
+    }
+
+    /**
+     * 批量删除
+     * @param array $id，注意id必须是数组，即使只有一个元素也得是数组格式
+     * @param bool $del
+     * 如果为true就是物理删除即真正的删除，
+     * 如果为false则是逻辑删除即将del_flag置为1
+    */
+    public function destroy($id, $del = true){
+        return $this->model->destroy($id, $del);
     }
 
     /**

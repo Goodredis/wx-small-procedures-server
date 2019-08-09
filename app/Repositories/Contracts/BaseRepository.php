@@ -65,5 +65,5 @@ interface BaseRepository
      * @param Model $model
      * @return mixed
      */
-    public function delete(Model $model);
+    public function delete(Model $model, $del=true);
 }

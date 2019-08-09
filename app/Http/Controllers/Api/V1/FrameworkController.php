@@ -32,8 +32,7 @@ class FrameworkController extends Controller
      * @param FrameworkRepository $frameworkRepository
      * @param FrameworkTransformer $frameworkTransformer
      */
-    public function __construct(FrameworkRepository $frameworkRepository, FrameworkTransformer $frameworkTransformer)
-    {
+    public function __construct(FrameworkRepository $frameworkRepository, FrameworkTransformer $frameworkTransformer){
         $this->frameworkRepository = $frameworkRepository;
         $this->frameworkTransformer = $frameworkTransformer;
 
@@ -52,12 +51,11 @@ class FrameworkController extends Controller
      * start_date：开始日期，例如2019-08-07
      * end_date：结束日期，例如2019-08-07
      * type：合同框架类型，1开发，2测试
-     * supplier: 供应商code
+     * supplier_code: 供应商code
      * status：合同框架状态，1执行中，2已完成
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request){
         $frameworks = $this->frameworkRepository->findBy($request->all());
         return $this->respondWithCollection($frameworks, $this->frameworkTransformer);
     }
@@ -67,8 +65,7 @@ class FrameworkController extends Controller
      * @param str $id
      * @return \Illuminate\Http\JsonResponse|string
      */
-    public function show(Request $request,$id)
-    {
+    public function show(Request $request,$id){
         $framework = $this->frameworkRepository->findOne($id);
         if (!$framework instanceof Framework) {
             return $this->sendNotFoundResponse("The framework with id {$id} doesn't exist");
@@ -80,10 +77,27 @@ class FrameworkController extends Controller
     /**
      * 添加合同框架信息，可同时添加框架详情信息
      * @param Request $request
+     * array(
+     *     'name' => xxx,
+     *     'code' => xxx,
+     *      'start_date' => 2019-08-07,
+     *      'end_data' => 2020-08-07,
+     *      'type' => 1,//合同框架类型，1开发，2测试
+     *      'supplier_code' => xxxx.//供应商code
+     *      'status'=> 1, //合同框架状态，1执行中，2已完成
+     *      'frameworkdetails' => array( //如果传了此参数就是有详情一起添加
+     *           0 => array(
+     *              "tax_ratio"=>0.93,
+     *              "price"=>55555,
+     *              "price_with_tax"=>33333,
+     *              "level"=>3,
+     *              "type"=>2
+     *          )
+     *       )
+     * )
      * @return \Illuminate\Http\JsonResponse|string
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         // Validation
         $validatorResponse = $this->validateRequest($request, $this->storeRequestValidationRules($request));
 
@@ -101,14 +115,13 @@ class FrameworkController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * 修改合同框架信息
      *
      * @param Request $request
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id){
         // Validation
         $validatorResponse = $this->validateRequest($request, $this->updateRequestValidationRules($request));
 
@@ -129,20 +142,26 @@ class FrameworkController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * 删除合同框架，可批量删除
      *
-     * @param $id
+     * @param str $id，合同框架表的id
+     * 如果是批量删除,则用英文,隔开id
      * @return \Illuminate\Http\JsonResponse|string
      */
-    public function destroy($id)
-    {
-        $framework = $this->FrameworkRepository->findOne($id);
+    public function destroy($id){
+        if(strstr($id, ',') !== false){
+            $id = explode(',', $id);
+            //传false是为了做逻辑删除,即将del_flag位置为1
+            $this->frameworkRepository->destroy($id,false);
+        }else{
+           $framework = $this->frameworkRepository->findOne($id);
 
-        if (!$framework instanceof Framework) {
-            return $this->sendNotFoundResponse("The Framework with id {$id} doesn't exist");
+            if (!$framework instanceof Framework) {
+                return $this->sendNotFoundResponse("The Framework with id {$id} doesn't exist");
+            }
+            //传false是为了做逻辑删除,即将del_flag位置为1
+            $this->frameworkRepository->delete($framework, false);
         }
-
-        $this->FrameworkRepository->delete($framework);
 
         return response()->json(null, 204);
     }
@@ -153,8 +172,7 @@ class FrameworkController extends Controller
      * @param Request $request
      * @return array
      */
-    private function storeRequestValidationRules(Request $request)
-    {
+    private function storeRequestValidationRules(Request $request){
         $rules = [
             'name'                  => 'required|max:255',
             'code'                  => 'required|max:64',
@@ -174,8 +192,7 @@ class FrameworkController extends Controller
      * @param Request $request
      * @return array
      */
-    private function updateRequestValidationRules(Request $request)
-    {
+    private function updateRequestValidationRules(Request $request){
         $rules = [
             'name'                  => 'max:255',
             'code'                  => 'max:64',
