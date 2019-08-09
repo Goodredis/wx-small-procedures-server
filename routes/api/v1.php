@@ -23,8 +23,13 @@ $api->version('v1', [
     'limit' => 20, 'expires' => 1,
 ], function ($api) {
     // Auth
+    $api->post('attendance', 'AttendanceController@store');
+    $api->get('attendance', 'AttendanceController@index');
+    $api->get('attendance/{uid}/{date}', 'AttendanceController@show');
+    $api->put('attendance/{id}', 'AttendanceController@update');
+    $api->delete('attendance/{id}', 'AttendanceController@destroy');
+
     $api->resources([ 'test' => 'TestController' ]);
-    $api->resources([ 'attendance' => 'AttendanceController' ]);
     $api->resources([ 'framwork' => 'FramworkController' ]);
     $api->resources([ 'framworkdetails' => 'FramworkdetailsController' ]);
     $api->resources([ 'supplier' => 'SupplierController' ]);

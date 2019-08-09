@@ -27,7 +27,6 @@ class Attendance extends Model
      * @var array
      */
     protected $fillable = [
-        'id',
         'uid',
         'remark',
         'position',

@@ -54,14 +54,9 @@ class AttendanceController extends Controller
      * @param $id
      * @return \Illuminate\Http\JsonResponse|string
      */
-    public function show($id) {
-        $attendance = $this->attendanceRepository->findOne($id);
-
-        if (!$attendance instanceof Attendance) {
-            return $this->sendNotFoundResponse("The attendance with id {$id} doesn't exist");
-        }
-
-        return $this->respondWithItem($attendance, $this->attendanceTransformer);
+    public function show($uid, $date) {
+        $attendances = $this->attendanceRepository->getAttendancesByDate($uid, $date);
+        return $this->respondWithArray([$uid => $attendances]);
     }
 
     /**
@@ -92,10 +87,10 @@ class AttendanceController extends Controller
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @param $id
+     * @param $uid
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, $id) {
+    public function update(Request $request, $uid) {
         // Validation
         $validatorResponse = $this->validateRequest($request, $this->updateRequestValidationRules($request));
 
@@ -104,15 +99,29 @@ class AttendanceController extends Controller
             return $this->sendInvalidFieldResponse($validatorResponse);
         }
 
-        $attendance = $this->attendanceRepository->findOne($id);
+        $requestData = $request->all();
+        $newAttendances = $this->attendanceRepository->arrangeUpdateCheckinat($requestData);
 
-        if (!$attendance instanceof Attendance) {
-            return $this->sendNotFoundResponse("The attendance with id {$id} doesn't exist");
+        if(!is_array($newAttendances)) {
+            return $this->sendCustomResponse(400, 'Error occurred on creating Attendance');
         }
 
-        $attendance = $this->attendanceRepository->update($attendance, $request->all());
+        foreach ($newAttendances as $key => $value) {
+            $value['remark']   = isset($requestData['remark']) ? $requestData['remark'] : '';
+            $value['position'] = isset($requestData['position']) ? $requestData['position'] : '';
+            $value['source']   = isset($requestData['source']) ? $requestData['source'] : 2;
+            $value['source_flag'] = 2;
+            $attendance = $this->attendanceRepository->findOne($value['id']);
 
-        return $this->respondWithItem($attendance, $this->attendanceTransformer);
+            if (!$attendance instanceof Attendance) {
+                return $this->sendNotFoundResponse("The attendance with id {$id} doesn't exist");
+            }
+
+            $this->attendanceRepository->update($attendance, $value);
+        }
+        
+        $attendances = $this->attendanceRepository->getAttendancesByDate($uid, $requestData['date']);
+        return $this->respondWithArray([$uid => $attendances]);
     }
 
     /**
@@ -146,10 +155,10 @@ class AttendanceController extends Controller
             // 'uid'                   => 'uid|required|unique:users',
             'remark'                => '',
             'position'              => 'string|max:255',
-            'purpose'               => 'integer|max:1',
+            'purpose'               => 'max:1',
             'check_in_at'           => 'max:11',
-            'source'                => 'integer|max:1',
-            'source_flag'           => 'integer|max:1',
+            'source'                => 'max:1',
+            'source_flag'           => 'max:1',
         ];
 
         return $rules;
@@ -163,13 +172,13 @@ class AttendanceController extends Controller
      */
     private function updateRequestValidationRules(Request $request) {
         $rules = [
-            'uid'                   => '',
-            'remark'                => '',
-            'position'              => '',
-            'purpose'               => '',
-            'check_in_at'           => '',
-            'source'                => '',
-            'source_flag'           => '',
+            'remark'                => 'max:255',
+            'position'              => 'max:255',
+            'purpose'               => 'max:1',
+            'check_in'              => 'max:255',
+            'check_out'             => 'max:255',
+            'source'                => 'max:1',
+            'source_flag'           => 'max:1',
         ];
 
         return $rules;
