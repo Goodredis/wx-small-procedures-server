@@ -72,13 +72,19 @@ abstract class AbstractEloquentRepository implements BaseRepository
     {
         $limit = !empty($searchCriteria['per_page']) ? (int)$searchCriteria['per_page'] : 15; // it's needed for pagination
 
-        $queryBuilder = $this->model->where(function ($query) use ($searchCriteria) {
+        $columns = ['*'];
+        if(!empty($searchCriteria['columns'])) {
+            $columns = explode(',', $searchCriteria['columns']);
+            unset($searchCriteria['columns']);;
+        }
+
+        $queryBuilder = $this->model->where(function ($query) use ($searchCriteria, $operatorCriteria) {
 
             $this->applySearchCriteriaInQueryBuilder($query, $searchCriteria, $operatorCriteria);
         }
         )->orderByRaw($orderCriteria);
 
-        return $queryBuilder->paginate($limit);
+        return $queryBuilder->paginate($limit, $columns, 'page', $searchCriteria['page']);
     }
 
 
@@ -105,7 +111,7 @@ abstract class AbstractEloquentRepository implements BaseRepository
             if (count($allValues) > 1) {
                 $queryBuilder->whereIn($key, $allValues);
             } else {
-                $operator = $operatorCriteria[$key];
+                $operator = array_key_exists($key, $operatorCriteria) ? $operatorCriteria[$key] : '=';
                 $queryBuilder->where($key, $operator, $value);
             }
         }
