@@ -4,21 +4,21 @@ namespace App\Providers;
 
 use App\Models\User;
 use App\Models\Test;
-use App\Models\Framwork;
-use App\Models\Framworkdetails;
+use App\Models\Framework;
+use App\Models\Frameworkdetails;
 use App\Models\Supplier;
 use App\Models\Attendance;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\Contracts\UserRepository;
 use App\Repositories\Contracts\TestRepository;
-use App\Repositories\Contracts\FramworkRepository;
-use App\Repositories\Contracts\FramworkdetailsRepository;
+use App\Repositories\Contracts\FrameworkRepository;
+use App\Repositories\Contracts\FrameworkdetailsRepository;
 use App\Repositories\Contracts\SupplierRepository;
 use App\Repositories\Contracts\AttendanceRepository;
 use App\Repositories\EloquentUserRepository;
 use App\Repositories\EloquentTestRepository;
-use App\Repositories\EloquentFramworkRepository;
-use App\Repositories\EloquentFramworkdetailsRepository;
+use App\Repositories\EloquentFrameworkRepository;
+use App\Repositories\EloquentFrameworkdetailsRepository;
 use App\Repositories\EloquentSupplierRepository;
 use App\Repositories\EloquentAttendanceRepository;
 
@@ -44,11 +44,11 @@ class RepositoriesServiceProvider extends ServiceProvider
         $this->app->bind(TestRepository::class, function () {
             return new EloquentTestRepository(new Test());
         });
-        $this->app->bind(FramworkRepository::class, function () {
-            return new EloquentFramworkRepository(new Framwork());
+        $this->app->bind(FrameworkRepository::class, function () {
+            return new EloquentFrameworkRepository(new Framework());
         });
-        $this->app->bind(FramworkdetailsRepository::class, function () {
-            return new EloquentFramworkdetailsRepository(new Framworkdetails());
+        $this->app->bind(FrameworkdetailsRepository::class, function () {
+            return new EloquentFrameworkdetailsRepository(new Frameworkdetails());
         });
         $this->app->bind(SupplierRepository::class, function () {
             return new EloquentSupplierRepository(new Supplier());
@@ -68,8 +68,8 @@ class RepositoriesServiceProvider extends ServiceProvider
         return [
             UserRepository::class,
             TestRepository::class,
-            FramworkRepository::class,
-            FramworkdetailsRepository::class,
+            FrameworkRepository::class,
+            FrameworkdetailsRepository::class,
             SupplierRepository::class,
             AttendanceRepository::class
         ];

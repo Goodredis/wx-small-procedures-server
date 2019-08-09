@@ -2,6 +2,6 @@
 
 namespace App\Repositories\Contracts;
 
-interface FramworkdetailsRepository  extends BaseRepository
+interface FrameworkdetailsRepository  extends BaseRepository
 {
 }

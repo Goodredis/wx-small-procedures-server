@@ -71,6 +71,7 @@ abstract class AbstractEloquentRepository implements BaseRepository
     public function findBy(array $searchCriteria = [], $operatorCriteria = [], $orderCriteria = 'created_at')
     {
         $limit = !empty($searchCriteria['per_page']) ? (int)$searchCriteria['per_page'] : 15; // it's needed for pagination
+        $page = !empty($searchCriteria['page']) ? (int)$searchCriteria['page'] : 1; //默认为第一页
 
         $columns = ['*'];
         if(!empty($searchCriteria['columns'])) {
@@ -84,7 +85,7 @@ abstract class AbstractEloquentRepository implements BaseRepository
         }
         )->orderByRaw($orderCriteria);
 
-        return $queryBuilder->paginate($limit, $columns, 'page', $searchCriteria['page']);
+        return $queryBuilder->paginate($limit, $columns, 'page', $page);
     }
 
 

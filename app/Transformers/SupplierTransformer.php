@@ -13,6 +13,7 @@ class SupplierTransformer extends TransformerAbstract
             'id'         => $supplier->id,
             'name'       => $supplier->name,
             'code'       => $supplier->code,
+            'framework'  => $supplier->framework,
             'created_at' => $supplier->created_at,
             'updated_at' => $supplier->updated_at,
             'del_flag'   => $supplier->del_flag

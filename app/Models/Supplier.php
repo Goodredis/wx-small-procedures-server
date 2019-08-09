@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class User extends Model
+class supplier extends Model
 {
     /**
      * 定义数据库表名
@@ -16,7 +16,22 @@ class User extends Model
     /**
      * 定义created_at与updated_at不自动管理
      */
-    public $timestamps = false;
+    // public $timestamps = false;
+
+    /**
+     * 设置时间格式
+     */
+    protected $casts = [
+        'created_at' => 'timestamps',
+        'updated_at' => 'timestamps'
+    ];
+
+    /**
+     * 模型的日期字段保存格式，时间戳
+     *
+     * @var string
+     */
+    protected $dateFormat = 'U';
 
     /**
      * 定义可操作的字段
@@ -34,8 +49,8 @@ class User extends Model
     /**
      * 获取厂商提供的框架合同
      */
-    public function framwork()
+    public function framework()
     {
-        return $this->hasMany('App\Models\Framework', 'supplier', 'code');
+        return $this->hasMany('App\Models\Framework', 'supplier_code', 'code');
     }
 }

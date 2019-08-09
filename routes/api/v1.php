@@ -30,7 +30,7 @@ $api->version('v1', [
     $api->delete('attendance/{id}', 'AttendanceController@destroy');
 
     $api->resources([ 'test' => 'TestController' ]);
-    $api->resources([ 'framwork' => 'FramworkController' ]);
-    $api->resources([ 'framworkdetails' => 'FramworkdetailsController' ]);
+    $api->resources([ 'framework' => 'FrameworkController' ]);
+    $api->resources([ 'frameworkdetails' => 'FrameworkdetailsController' ]);
     $api->resources([ 'supplier' => 'SupplierController' ]);
 });

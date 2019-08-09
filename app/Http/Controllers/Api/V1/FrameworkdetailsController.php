@@ -1,27 +1,30 @@
 <?php
+/**
+ * 合同框架详情
+ */
+namespace App\Http\Controllers\Api\V1;
 
-namespace App\Http\Controllers;
-
-use App\Models\Framworkdetails;
-use App\Repositories\Contracts\FramworkdetailsRepository;
+use App\Http\Controllers\Controller;
+use App\Models\Frameworkdetails;
+use App\Repositories\Contracts\FrameworkdetailsRepository;
 use Illuminate\Http\Request;
-use App\Transformers\FramworkdetailsTransformer;
+use App\Transformers\FrameworkdetailsTransformer;
 
-class FramworkdetailsController extends Controller
+class FrameworkdetailsController extends Controller
 {
-    private $userRepository;
-    private $userTransformer;
+    private $frameworkdetailsRepository;
+    private $frameworkdetailsTransformer;
 
     /**
      * Constructor
      *
-     * @param FramworkdetailsRepository $FramworkdetailsRepository
-     * @param FramworkdetailsTransformer $FramworkdetailsTransformer
+     * @param FrameworkdetailsRepository $frameworkdetailsRepository
+     * @param FrameworkdetailsTransformer $frameworkdetailsTransformer
      */
-    public function __construct(FramworkdetailsRepository $FramworkdetailsRepository, FramworkdetailsTransformer $FramworkdetailsTransformer)
+    public function __construct(FrameworkdetailsRepository $frameworkdetailsRepository, FrameworkdetailsTransformer $frameworkdetailsTransformer)
     {
-        $this->FramworkdetailsRepository = $FramworkdetailsRepository;
-        $this->FramworkdetailsTransformer = $FramworkdetailsTransformer;
+        $this->frameworkdetailsRepository = $frameworkdetailsRepository;
+        $this->frameworkdetailsTransformer = $frameworkdetailsTransformer;
 
         parent::__construct();
     }
@@ -34,7 +37,8 @@ class FramworkdetailsController extends Controller
      */
     public function index(Request $request)
     {
-
+        $frameworkdetails = $this->frameworkdetailsRepository->findBy($request->all());
+        return $this->respondWithCollection($frameworkdetails, $this->frameworkdetailsTransformer);
     }
 
     /**

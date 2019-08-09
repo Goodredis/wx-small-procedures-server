@@ -2,11 +2,11 @@
 
 namespace App\Repositories;
 
-use App\Repositories\Contracts\SupplierRepository;
-use App\Models\Supplier;
+use App\Repositories\Contracts\FrameworkdetailsRepository;
+use App\Models\Frameworkdetails;
 use Illuminate\Database\Eloquent\Model;
 
-class EloquentSupplierRepository extends AbstractEloquentRepository implements SupplierRepository
+class EloquentFrameworkdetailsRepository extends AbstractEloquentRepository implements FrameworkdetailsRepository
 {
 
     /*
@@ -14,8 +14,9 @@ class EloquentSupplierRepository extends AbstractEloquentRepository implements S
      */
     public function save(array $data, $generateUidFlag = false)
     {
-        $supplier = parent::save($data);
-        return $supplier;
+
+        $frameworkdetails = parent::save($data);
+        return $frameworkdetails;
     }
 
     /**
@@ -23,9 +24,9 @@ class EloquentSupplierRepository extends AbstractEloquentRepository implements S
      */
     public function update(Model $model, array $data)
     {
-        $updatedSupplier = parent::update($model, $data);
+        $updatedFrameworkdetails = parent::update($model, $data);
 
-        return $updatedSupplier;
+        return $updatedFrameworkdetails;
     }
 
     /**
