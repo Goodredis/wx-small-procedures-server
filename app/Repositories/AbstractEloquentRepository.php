@@ -72,7 +72,7 @@ abstract class AbstractEloquentRepository implements BaseRepository
     /**
      * @inheritdoc
      */
-    public function findBy(array $searchCriteria = [], $operatorCriteria = [], $orderCriteria = 'created_at')
+    public function findBy(array $searchCriteria = [], $operatorCriteria = [])
     {
         $limit = !empty($searchCriteria['per_page']) ? (int)$searchCriteria['per_page'] : 15; // it's needed for pagination
         $page = !empty($searchCriteria['page']) ? (int)$searchCriteria['page'] : 1; //默认为第一页
@@ -82,12 +82,18 @@ abstract class AbstractEloquentRepository implements BaseRepository
             $columns = explode(',', $searchCriteria['columns']);
             unset($searchCriteria['columns']);;
         }
+        $orderby = '';
+        if(!empty($searchCriteria['orderby'])) {
+            $orderby = trim($searchCriteria['orderby']);
+            unset($searchCriteria['orderby']);
+        }
 
         $queryBuilder = $this->model->where(function ($query) use ($searchCriteria, $operatorCriteria) {
 
             $this->applySearchCriteriaInQueryBuilder($query, $searchCriteria, $operatorCriteria);
-        }
-        )->orderByRaw($orderCriteria);
+        });
+
+        $queryBuilder = $this->applyOrderCriteriaInQueryBuilder($queryBuilder, $orderby);
 
         return $queryBuilder->paginate($limit, $columns, 'page', $page);
     }
@@ -112,15 +118,39 @@ abstract class AbstractEloquentRepository implements BaseRepository
 
             //we can pass multiple params for a filter with commas
             $allValues = explode(',', $value);
+            $betValues = explode('~', $value);
 
             if (count($allValues) > 1) {
                 $queryBuilder->whereIn($key, $allValues);
+            } elseif (count($betValues) > 1 && $operatorCriteria[$key] == 'between') {
+                $queryBuilder->whereBetween($key, $betValues);
             } else {
                 $operator = array_key_exists($key, $operatorCriteria) ? $operatorCriteria[$key] : '=';
                 $queryBuilder->where($key, $operator, $value);
             }
         }
 
+        return $queryBuilder;
+    }
+
+    protected function applyOrderCriteriaInQueryBuilder($queryBuilder, $orderby) {
+        if (!empty($orderby)) {
+            if (strrpos($orderby, ',') === false) {
+                $tmp = explode(' ', trim($orderby));
+                $field = count($tmp) > 1 ? current($tmp) : $orderby;
+                $seqence = count($tmp) > 1 ? end($tmp) : 'ASC';
+                $queryBuilder = $queryBuilder->orderBy($field, $seqence);
+            } else {
+                $sections = explode(',', trim($orderby));
+                foreach ($sections as $section) {
+                    $section = trim($section);
+                    if ($section) {
+                        $tmp = explode(' ', $section);
+                        $queryBuilder = $queryBuilder->orderBy(trim($tmp[0]), isset($tmp[1]) ? $tmp[1] : 'ASC');
+                    }
+                }
+            }
+        }
         return $queryBuilder;
     }
 

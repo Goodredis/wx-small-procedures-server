@@ -30,8 +30,19 @@ class EloquentAttendanceRepository extends AbstractEloquentRepository implements
 	/**
      * @inheritdoc
      */
-    public function findBy(array $searchCriteria = [], $operatorCriteria = [], $orderCriteria = 'created_at') {
-        return parent::findBy($searchCriteria, $operatorCriteria, $orderCriteria);
+    public function findBy(array $searchCriteria = [], $operatorCriteria = []) {
+        $params = array();
+        if (isset($searchCriteria['uid'])) {
+            $params['uid'] = trim($searchCriteria['uid']);
+        }
+        if (isset($searchCriteria['start_time']) && isset($searchCriteria['end_time'])) {
+            $params['check_in_at'] = $searchCriteria['start_time'] . "~" . $searchCriteria['end_time'];
+            $operatorCriteria['check_in_at'] = 'between';
+        }
+        if (isset($searchCriteria['orderby'])) {
+            $params['orderby'] = $searchCriteria['orderby'];
+        }
+        return parent::findBy($params, $operatorCriteria);
     }
 
     /**
@@ -39,6 +50,43 @@ class EloquentAttendanceRepository extends AbstractEloquentRepository implements
      */
     public function findOne($id) {
         return parent::findOne($id);
+    }
+
+    public function exportAttendance(array $export_data = []) {
+        $export_data = array(
+            array(
+                'date'      => '20190808',
+                'name'      => 'test1',
+                'check_in'  => '2019-08-08 08:37:28',
+                'check_out' => '2019-08-08 18:07:56',
+                'status'    => '正常',
+            ),
+            array(
+                'date'      => '20190809',
+                'name'      => 'test2',
+                'check_in'  => '2019-08-09 08:36:28',
+                'check_out' => '2019-08-09 18:06:56',
+                'status'    => '正常',
+            ),
+            array(
+                'date'      => '20190810',
+                'name'      => 'test3',
+                'check_in'  => '2019-08-10 08:35:28',
+                'check_out' => '2019-08-10 18:05:56',
+                'status'    => '正常',
+            ),
+            array(
+                'date'      => '20190811',
+                'name'      => 'test4',
+                'check_in'  => '2019-08-11 08:33:28',
+                'check_out' => '2019-08-11 18:03:56',
+                'status'    => '正常',
+            ),
+        );
+        $format_column = array('日期', '姓名', '上班时间', '下班时间', '状态');
+        $filename = '外协人员考勤信息';
+        parent::export($export_data, $format_column, $filename);
+        exit;
     }
 
     public function getAttendancesByDate($uid, $date) {

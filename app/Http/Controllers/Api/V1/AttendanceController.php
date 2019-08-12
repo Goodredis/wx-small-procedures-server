@@ -143,6 +143,12 @@ class AttendanceController extends Controller
         return response()->json(null, 204);
     }
 
+    public function export(Request $request) {
+        $export_data = $this->attendanceRepository->findBy($request->all());
+        $attendances = $this->attendanceRepository->exportAttendance($export_data->toArray());
+        return $this->respondWithCollection($attendances, $this->attendanceTransformer);
+    }
+
     /**
      * Store Request Validation Rules
      *

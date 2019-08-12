@@ -23,12 +23,8 @@ $api->version('v1', [
     'limit' => 20, 'expires' => 1,
 ], function ($api) {
     // Auth
-    $api->post('attendance', 'AttendanceController@store');
-    $api->get('attendance', 'AttendanceController@index');
-    $api->get('attendance/{uid}/{date}', 'AttendanceController@show');
-    $api->put('attendance/{id}', 'AttendanceController@update');
-    $api->delete('attendance/{id}', 'AttendanceController@destroy');
-
+    $api->get('attendances/export', 'AttendanceController@export');
+    $api->resources([ 'attendances' => 'AttendanceController' ]);
     $api->resources([ 'test' => 'TestController' ]);
     //合同框架的批量删除
     $api->post('frameworkContracts/batchdeletion', 'FrameworkController@destroymany');

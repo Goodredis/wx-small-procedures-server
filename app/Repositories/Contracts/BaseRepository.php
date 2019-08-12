@@ -31,7 +31,7 @@ interface BaseRepository
      * @param string $orderCriteria
      * @return Collection
      */
-    public function findBy(array $searchCriteria = [], $operatorCriteria = [], $orderCriteria = 'created_at');
+    public function findBy(array $searchCriteria = [], $operatorCriteria = []);
 
     /**
      * Search All resources by any values of a key
