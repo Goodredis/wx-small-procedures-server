@@ -5,20 +5,24 @@ namespace App\Repositories;
 use App\Repositories\Contracts\FrameworkRepository;
 use App\Models\Framework;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Frameworkdetails;
 
 class EloquentFrameworkRepository extends AbstractEloquentRepository implements FrameworkRepository
 {
     /*
      * 增加合同框架，可同时添加合同框架的详情
      */
-    public function save(array $data, $generateUidFlag = false){
-        $data['id'] = md5($data['code']);
+    public function save(array $data, $generateUidFlag = true){
         //先创建合同框架
         $framework = parent::save($data, $generateUidFlag);
         //如果有合同框架详情就创建合同框架详情
         if(isset($data['frameworkdetails'])){
             $frameworkdetails = $data['frameworkdetails'];
+            //如果没有填详情的税率，就按框架基本信息的税率
+            foreach ($frameworkdetails as $key => $value) {
+                if(!isset($value['tax_ratio'])){
+                    $frameworkdetails[$key]['tax_ratio'] = $data['tax_ratio'];
+                }
+            }
             $framework->frameworkdetails()->createMany($frameworkdetails);
         }
         return $framework;
@@ -28,26 +32,19 @@ class EloquentFrameworkRepository extends AbstractEloquentRepository implements 
      * 修改合同框架,可同时修改合同框架的详情信息
      */
     public function update(Model $model, array $data){
-        //如果更新了合同框架的编号code，则更新所有详情表的framework_id,因为合同框架表的id是根据code经过md5生成的
-        if($data['code'] != $model->code){
-            $data['id'] = md5($data['code']);
-            $framework = $this -> findOne($model->id);
-            $framework->frameworkdetails()->rawUpdate(['framework_id'=>$data['id']]);
+        //更新详情表,先删除所有的详情，然后再添加
+        $old_frameworkdetails = $model->frameworkdetails();
+        foreach ($old_frameworkdetails->get() as $frameworkdetails) {
+            $frameworkdetails->delete();
         }
 
         //更新合同框架的基本信息
         $updatedFramework = parent::update($model, $data);
 
-        //更新详情表
-        if(isset($data['frameworkdetails'])){
-            foreach ($data['frameworkdetails'] as $key => $value) {
-                $details_conditions = [
-                    'id' => $value['id'],
-                    'framework_id' => $data['id']
-                ];
-                $value['framework_id'] = $data['id'];
-                $updatedFramework->frameworkdetails()-> updateOrCreate($details_conditions,$value);
-            }
+        //添加合同框架的详情信息
+        if(isset($data['frameworkdetails']) && !empty($data['frameworkdetails'])){
+            $new_frameworkdetails = $data['frameworkdetails'];
+            $updatedFramework->frameworkdetails()->createMany($new_frameworkdetails);
         }
 
         return $updatedFramework;
@@ -64,47 +61,31 @@ class EloquentFrameworkRepository extends AbstractEloquentRepository implements 
 
     /**
      * @inheritdoc
-     * 搜索del_flag位为0的，即没有删除的
      */
     public function findOne($id){
-        $searchCriteria = [
-            'id'       => $id,
-            'del_flag' => 0
-        ];
-        return parent::findOneBy($searchCriteria);
+        return parent::findOne($id);
     }
 
     /**
      * @inheritdoc
-     * @param bool $del
-     * 如果为true就是物理删除即真正的删除，
-     * 如果为false则是逻辑删除即将del_flag置为1
+     * 删除某一个合同框架，不删除框架详情信息
+     * 逻辑删除，将del_flag位置为1
      */
-    public function delete(Model $model, $del=true){
-        //删除合同框架详情
-        $details_model = new Frameworkdetails();
-        $details_model -> where('framework_id', $model->id)->delete();
-
+    public function delete(Model $model){
         //删除合同框架基本信息
-        $result = parent::delete($model, $del);
-        return $result;
+        return parent::update($model, ['del_flag' => 1]);
     }
 
     /**
-     * 批量删除
-     * @param array $id，注意id必须是数组，即使只有一个元素也得是数组格式
-     * @param bool $del
-     * 如果为true就是物理删除即真正的删除，
-     * 如果为false则是逻辑删除即将del_flag置为1
+     * 批量删除，不删除框架详情信息
+     * 逻辑删除，将del_flag位置为1
+     * @param array $ids，注意id必须是数组，即使只有一个元素也得是数组格式
     */
-    public function destroy($id, $del = true){
-        //删除合同框架详情
-        $details_model = new Frameworkdetails();
-        $details_model -> whereIn('framework_id', $id)->delete();
-
-        //删除合同框架基本信息
-        $result = parent::destroy($id, $del);
-        return $result;
+    public function destroy($ids){
+        foreach ($ids as $key => $id) {
+            $framework = $this -> findOne($id);
+            $this ->delete($framework);
+        }
     }
 
 }

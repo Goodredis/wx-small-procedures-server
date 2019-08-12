@@ -51,6 +51,8 @@ class Framework extends Model
         'end_date',      //'合同截止日期',
         'type',          //'框架类型，1开发，2测试',
         'tax_ratio',     //'税率',
+        'price',         //'不含税价款',
+        'price_with_tax',//'含税价款',
         'supplier_code', //'供应商code',
         'status',        //'框架订单状态，1执行中，2已完成',
         'created_at',    //'合同创建日期',
@@ -70,6 +72,6 @@ class Framework extends Model
      * 获取框架合同详情
      */
     public function frameworkdetails(){
-        return $this->hasMany('App\Models\Frameworkdetails', 'framework_id', 'id');
+        return $this->hasMany('App\Models\Frameworkdetails', 'framework_id', 'id')->orderBy('id','desc');
     }
 }

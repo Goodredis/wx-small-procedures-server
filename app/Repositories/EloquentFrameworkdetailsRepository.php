@@ -11,28 +11,27 @@ class EloquentFrameworkdetailsRepository extends AbstractEloquentRepository impl
 
     /*
      * @inheritdoc
+     * 新建合同框架的一条详情信息
      */
     public function save(array $data, $generateUidFlag = false)
     {
+        return parent::save($data,$generateUidFlag);
+    }
 
-        $frameworkdetails = parent::save($data);
+    /**
+     * @inheritdoc
+     * 更新合同框架的某条详情信息
+     */
+    public function update(Model $model, array $data)
+    {
+        $frameworkdetails = parent::update($model, $data);
         return $frameworkdetails;
     }
 
     /**
      * @inheritdoc
      */
-    public function update(Model $model, array $data)
-    {
-        $updatedFrameworkdetails = parent::update($model, $data);
-
-        return $updatedFrameworkdetails;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function findBy(array $searchCriteria = [], $operatorCriteria = [], $orderCriteria = 'created_at')
+    public function findBy(array $searchCriteria = [], $operatorCriteria = [], $orderCriteria = 'framework_id,created_at desc')
     {
         return parent::findBy($searchCriteria, $operatorCriteria, $orderCriteria);
     }

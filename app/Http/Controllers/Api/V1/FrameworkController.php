@@ -98,10 +98,10 @@ class FrameworkController extends Controller
      * @return \Illuminate\Http\JsonResponse|string
      */
     public function store(Request $request){
-        // Validation
+        // 检查参数是否合法
         $validatorResponse = $this->validateRequest($request, $this->storeRequestValidationRules($request));
 
-        // Send failed response if validation fails
+        // 返回参数不合法错误
         if ($validatorResponse !== true) {
             return $this->sendInvalidFieldResponse($validatorResponse);
         }
@@ -118,14 +118,32 @@ class FrameworkController extends Controller
      * 修改合同框架信息
      *
      * @param Request $request
-     * @param $id
+     * array(
+     *      'name' => xxx,
+     *      'code' => xxx,
+     *      'start_date' => 2019-08-07,
+     *      'end_data' => 2020-08-07,
+     *      'type' => 1,//合同框架类型，1开发，2测试
+     *      'supplier_code' => xxxx.//供应商code
+     *      'status'=> 1, //合同框架状态，1执行中，2已完成
+     *      'frameworkdetails' => array( //如果传了此参数就是有详情一起添加
+     *           0 => array(
+     *              "tax_ratio"=>0.93,
+     *              "price"=>55555,
+     *              "price_with_tax"=>33333,
+     *              "level"=>3,
+     *              "type"=>2
+     *          )
+     *       )
+     * )
+     * @param $id,合同框架表的id
      * @return \Illuminate\Http\JsonResponse
      */
     public function update(Request $request, $id){
-        // Validation
+        // 检查参数是否合法
         $validatorResponse = $this->validateRequest($request, $this->updateRequestValidationRules($request));
 
-        // Send failed response if validation fails
+        // 返回参数不合法错误
         if ($validatorResponse !== true) {
             return $this->sendInvalidFieldResponse($validatorResponse);
         }
@@ -142,27 +160,30 @@ class FrameworkController extends Controller
     }
 
     /**
-     * 删除合同框架，可批量删除
+     * 删除合同框架
      *
      * @param str $id，合同框架表的id
-     * 如果是批量删除,则用英文,隔开id
      * @return \Illuminate\Http\JsonResponse|string
      */
     public function destroy($id){
-        if(strstr($id, ',') !== false){
-            $id = explode(',', $id);
-            //传false是为了做逻辑删除,即将del_flag位置为1
-            $this->frameworkRepository->destroy($id,false);
-        }else{
-           $framework = $this->frameworkRepository->findOne($id);
+        $framework = $this->frameworkRepository->findOne($id);
 
-            if (!$framework instanceof Framework) {
-                return $this->sendNotFoundResponse("The Framework with id {$id} doesn't exist");
-            }
-            //传false是为了做逻辑删除,即将del_flag位置为1
-            $this->frameworkRepository->delete($framework, false);
+        if (!$framework instanceof Framework) {
+            return $this->sendNotFoundResponse("The Framework with id {$id} doesn't exist");
         }
+        //传false是为了做逻辑删除,即将del_flag位置为1
+        $this->frameworkRepository->delete($framework);
+        return response()->json(null, 204);
+    }
 
+    /**
+     * 批量删除合同框架
+     *
+     * @param array $ids，合同框架表的id数组
+     * @return \Illuminate\Http\JsonResponse|string
+     */
+    public function destroymany(Request $request){
+        $this->frameworkRepository->destroy($request->all());
         return response()->json(null, 204);
     }
 
@@ -178,6 +199,7 @@ class FrameworkController extends Controller
             'code'                  => 'required|max:64',
             'start_date'            => 'date',
             'end_date'              => 'date',
+            'tax_ratio'             => 'required',
             'type'                  => 'integer|in:1,2',
             'supplier_code'         => 'required|max:64',
             'frameworkdetails'      => 'array'

@@ -30,7 +30,11 @@ $api->version('v1', [
     $api->delete('attendance/{id}', 'AttendanceController@destroy');
 
     $api->resources([ 'test' => 'TestController' ]);
-    $api->resources([ 'framework' => 'FrameworkController' ]);
-    $api->resources([ 'frameworkdetails' => 'FrameworkdetailsController' ]);
+    //合同框架的批量删除
+    $api->post('frameworkContracts/batchdeletion', 'FrameworkController@destroymany');
+    //合同框架的增删改查
+    $api->resources([ 'frameworkContracts' => 'FrameworkController' ]);
+    $api->resources([ 'frameworkdetailsContracts' => 'FrameworkdetailsController' ]);
+    //厂商的增删改查
     $api->resources([ 'supplier' => 'SupplierController' ]);
 });
