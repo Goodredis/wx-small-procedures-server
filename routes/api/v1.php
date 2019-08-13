@@ -23,6 +23,7 @@ $api->version('v1', [
     'limit' => 20, 'expires' => 1,
 ], function ($api) {
     // Auth
+    $api->get('attendances/list', 'AttendanceController@list');
     $api->get('attendances/export', 'AttendanceController@export');
     $api->resources([ 'attendances' => 'AttendanceController' ]);
     $api->resources([ 'test' => 'TestController' ]);

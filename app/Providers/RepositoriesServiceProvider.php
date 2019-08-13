@@ -8,6 +8,7 @@ use App\Models\Framework;
 use App\Models\Frameworkdetails;
 use App\Models\Supplier;
 use App\Models\Attendance;
+use App\Models\Attendanceview;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\Contracts\UserRepository;
 use App\Repositories\Contracts\TestRepository;
@@ -15,12 +16,14 @@ use App\Repositories\Contracts\FrameworkRepository;
 use App\Repositories\Contracts\FrameworkdetailsRepository;
 use App\Repositories\Contracts\SupplierRepository;
 use App\Repositories\Contracts\AttendanceRepository;
+use App\Repositories\Contracts\AttendanceviewRepository;
 use App\Repositories\EloquentUserRepository;
 use App\Repositories\EloquentTestRepository;
 use App\Repositories\EloquentFrameworkRepository;
 use App\Repositories\EloquentFrameworkdetailsRepository;
 use App\Repositories\EloquentSupplierRepository;
 use App\Repositories\EloquentAttendanceRepository;
+use App\Repositories\EloquentAttendanceviewRepository;
 
 class RepositoriesServiceProvider extends ServiceProvider
 {
@@ -56,6 +59,9 @@ class RepositoriesServiceProvider extends ServiceProvider
         $this->app->bind(AttendanceRepository::class, function () {
             return new EloquentAttendanceRepository(new Attendance());
         });
+        $this->app->bind(AttendanceviewRepository::class, function () {
+            return new EloquentAttendanceviewRepository(new Attendanceview());
+        });
     }
 
     /**
@@ -71,7 +77,8 @@ class RepositoriesServiceProvider extends ServiceProvider
             FrameworkRepository::class,
             FrameworkdetailsRepository::class,
             SupplierRepository::class,
-            AttendanceRepository::class
+            AttendanceRepository::class,
+            AttendanceviewRepository::class
         ];
     }
 }

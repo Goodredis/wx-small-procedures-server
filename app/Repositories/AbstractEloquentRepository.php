@@ -135,19 +135,12 @@ abstract class AbstractEloquentRepository implements BaseRepository
 
     protected function applyOrderCriteriaInQueryBuilder($queryBuilder, $orderby) {
         if (!empty($orderby)) {
-            if (strrpos($orderby, ',') === false) {
-                $tmp = explode(' ', trim($orderby));
-                $field = count($tmp) > 1 ? current($tmp) : $orderby;
-                $seqence = count($tmp) > 1 ? end($tmp) : 'ASC';
-                $queryBuilder = $queryBuilder->orderBy($field, $seqence);
-            } else {
-                $sections = explode(',', trim($orderby));
-                foreach ($sections as $section) {
-                    $section = trim($section);
-                    if ($section) {
-                        $tmp = explode(' ', $section);
-                        $queryBuilder = $queryBuilder->orderBy(trim($tmp[0]), isset($tmp[1]) ? $tmp[1] : 'ASC');
-                    }
+            $sections = explode(',', trim($orderby));
+            foreach ($sections as $section) {
+                $section = trim($section);
+                if ($section) {
+                    $tmp = explode(' ', $section);
+                    $queryBuilder = $queryBuilder->orderBy(trim($tmp[0]), isset($tmp[1]) ? $tmp[1] : 'ASC');
                 }
             }
         }

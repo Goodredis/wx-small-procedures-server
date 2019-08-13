@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Attendance extends Model
+class Attendanceview extends Model
 {
 
     /**
@@ -12,7 +12,7 @@ class Attendance extends Model
      *
      * @var string
      */
-    protected $table = 'attendance';
+    protected $table = 'attendance_view';
 
     /**
      * Storage format of date field
@@ -28,14 +28,17 @@ class Attendance extends Model
      */
     protected $fillable = [
         'uid',
-        'remark',
-        'position',
-        'purpose',
         'workdate',
-        'check_at',
-        'source',
-        'source_flag',
-        'del_flag',
+        'checkin_remark',
+        'checkout_remark',
+        'checkin_position',
+        'checkout_position',
+        'checkin_at',
+        'checkout_at',
+        'checkin_source',
+        'checkout_source',
+        'checkin_source_flag',
+        'checkin_source_flag',
     ];
     
 }

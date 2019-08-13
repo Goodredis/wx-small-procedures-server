@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Api\V1;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
+use App\Models\Attendanceview;
 use App\Repositories\Contracts\AttendanceRepository;
+use App\Repositories\Contracts\AttendanceviewRepository;
 use App\Transformers\AttendanceTransformer;
+use App\Transformers\AttendanceviewTransformer;
 
 class AttendanceController extends Controller
 {
@@ -18,6 +21,14 @@ class AttendanceController extends Controller
     private $attendanceRepository;
 
     /**
+     * Instance of AttendanceviewRepository
+     *
+     * @var AttendanceviewRepository
+     */
+    private $attendanceviewRepository;
+
+
+    /**
      * Instanceof AttendanceTransformer
      *
      * @var AttendanceTransformer
@@ -25,15 +36,25 @@ class AttendanceController extends Controller
     private $attendanceTransformer;
 
     /**
+     * Instanceof AttendanceviewTransformer
+     *
+     * @var AttendanceviewTransformer
+     */
+    private $attendanceviewTransformer;
+
+    /**
      * Constructor
      *
      * @param AttendanceRepository $attendanceRepository
+     * @param AttendanceviewRepository $attendanceviewRepository
      * @param AttendanceTransformer $attendanceTransformer
      */
-    public function __construct(AttendanceRepository $attendanceRepository, AttendanceTransformer $attendanceTransformer) {
+    public function __construct(AttendanceRepository $attendanceRepository, AttendanceviewRepository $attendanceviewRepository, AttendanceTransformer $attendanceTransformer, AttendanceviewTransformer $attendanceviewTransformer) {
         $this->attendanceRepository = $attendanceRepository;
+        $this->attendanceviewRepository = $attendanceviewRepository;
         $this->attendanceTransformer = $attendanceTransformer;
-
+        $this->attendanceviewTransformer = $attendanceviewTransformer;
+        
         parent::__construct();
     }
 
@@ -49,14 +70,19 @@ class AttendanceController extends Controller
 	}
 
     /**
-     * Display the specified resource.
+     * Display the specified rpesource.
      *
      * @param $id
      * @return \Illuminate\Http\JsonResponse|string
      */
-    public function show($uid, $date) {
-        $attendances = $this->attendanceRepository->getAttendancesByDate($uid, $date);
-        return $this->respondWithArray([$uid => $attendances]);
+    public function show($id) {
+        $attendances = $this->attendanceRepository->findOne(intval($id));
+
+        if (!$attendances instanceof Attendance) {
+            return $this->sendNotFoundResponse("The attendances with id {$id} doesn't exist");
+        }
+
+        return $this->respondWithItem($attendances, $this->attendanceTransformer);
     }
 
     /**
@@ -87,41 +113,24 @@ class AttendanceController extends Controller
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @param $uid
+     * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, $uid) {
+    public function update(Request $request, $id) {
         // Validation
         $validatorResponse = $this->validateRequest($request, $this->updateRequestValidationRules($request));
-
         // Send failed response if validation fails
         if ($validatorResponse !== true) {
             return $this->sendInvalidFieldResponse($validatorResponse);
         }
-
-        $requestData = $request->all();
-        $newAttendances = $this->attendanceRepository->arrangeUpdateCheckinat($requestData);
-
-        if(!is_array($newAttendances)) {
-            return $this->sendCustomResponse(400, 'Error occurred on creating Attendance');
+        $attendance = $this->attendanceRepository->findOne($id);
+        if (!$attendance instanceof Attendance) {
+            return $this->sendNotFoundResponse("The attendance with id {$id} doesn't exist");
         }
 
-        foreach ($newAttendances as $key => $value) {
-            $value['remark']   = isset($requestData['remark']) ? $requestData['remark'] : '';
-            $value['position'] = isset($requestData['position']) ? $requestData['position'] : '';
-            $value['source']   = isset($requestData['source']) ? $requestData['source'] : 2;
-            $value['source_flag'] = 2;
-            $attendance = $this->attendanceRepository->findOne($value['id']);
+        $attendance = $this->attendanceRepository->update($attendance, $request->all());
 
-            if (!$attendance instanceof Attendance) {
-                return $this->sendNotFoundResponse("The attendance with id {$id} doesn't exist");
-            }
-
-            $this->attendanceRepository->update($attendance, $value);
-        }
-        
-        $attendances = $this->attendanceRepository->getAttendancesByDate($uid, $requestData['date']);
-        return $this->respondWithArray([$uid => $attendances]);
+        return $this->respondWithItem($attendance, $this->attendanceTransformer);
     }
 
     /**
@@ -130,8 +139,7 @@ class AttendanceController extends Controller
      * @param $id
      * @return \Illuminate\Http\JsonResponse|string
      */
-    public function destroy($id)
-    {
+    public function destroy($id) {
         $attendance = $this->attendanceRepository->findOne($id);
 
         if (!$attendance instanceof Attendance) {
@@ -143,8 +151,13 @@ class AttendanceController extends Controller
         return response()->json(null, 204);
     }
 
+    public function list(Request $request) {
+        $lists = $this->attendanceviewRepository->findBy($request->all());
+        return $this->respondWithCollection($lists, $this->attendanceviewTransformer);
+    }
+
     public function export(Request $request) {
-        $export_data = $this->attendanceRepository->findBy($request->all());
+        $export_data = $this->attendanceviewRepository->findBy($request->all());
         $attendances = $this->attendanceRepository->exportAttendance($export_data->toArray());
         return $this->respondWithCollection($attendances, $this->attendanceTransformer);
     }
@@ -160,13 +173,13 @@ class AttendanceController extends Controller
             'uid'                   => 'string|required|max:36',
             // 'uid'                   => 'uid|required|unique:users',
             'remark'                => '',
-            'position'              => 'string|max:255',
+            'position'              => 'max:255',
             'purpose'               => 'max:1',
-            'check_in_at'           => 'max:11',
+            'workdate'              => 'max:8',
+            'check_at'              => 'max:11',
             'source'                => 'max:1',
             'source_flag'           => 'max:1',
         ];
-
         return $rules;
     }
 
@@ -178,11 +191,13 @@ class AttendanceController extends Controller
      */
     private function updateRequestValidationRules(Request $request) {
         $rules = [
+            'uid'                   => '',
+            // 'uid'                   => 'uid|required|unique:users',
             'remark'                => 'max:255',
             'position'              => 'max:255',
             'purpose'               => 'max:1',
-            'check_in'              => 'max:255',
-            'check_out'             => 'max:255',
+            'workdate'              => '',
+            'check_at'              => 'max:11',
             'source'                => 'max:1',
             'source_flag'           => 'max:1',
         ];
