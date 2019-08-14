@@ -28,7 +28,9 @@ $api->version('v1', [
     $api->resources([ 'attendances' => 'AttendanceController' ]);
     $api->resources([ 'test' => 'TestController' ]);
     //合同框架的批量删除
-    $api->post('frameworkContracts/batchdeletion', 'FrameworkController@destroymany');
+    $api->post('frameworkContracts/batchdeletion', 'FrameworkController@destroyMany');
+    //合同框架的导入
+    $api->post('frameworkContracts/import', 'FrameworkController@import');
     //合同框架的增删改查
     $api->resources([ 'frameworkContracts' => 'FrameworkController' ]);
     $api->resources([ 'frameworkdetailsContracts' => 'FrameworkdetailsController' ]);

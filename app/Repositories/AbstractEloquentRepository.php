@@ -208,9 +208,7 @@ abstract class AbstractEloquentRepository implements BaseRepository
     public function import($filePath, array $format_column) {
         
         // load import file
-        $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
-        $reader->setReadDataOnly(true);
-        $spreadsheet = $reader->load($filePath);
+        $spreadsheet = IOFactory::load($filePath);
         // get sheet number
         $current_sheet   = $spreadsheet->getActiveSheet(); 
 
@@ -219,9 +217,10 @@ abstract class AbstractEloquentRepository implements BaseRepository
         $highestColumnIndex = Coordinate::columnIndexFromString($highestColumn); 
 
         $import_data = $column_data = [];
-        $lines       = $highestRow - 2;
+        $lines       = $highestRow - 1;
         if ($lines <= 0) {
-            var_dump('Excel表格中没有数据');exit;
+            // var_dump('Excel表格中没有数据');exit;
+            return ['err_code' => 40003];
         }
 
         for ($col = 1; $col <= $highestColumnIndex; ++$col) //列数是以A列开始
@@ -243,20 +242,29 @@ abstract class AbstractEloquentRepository implements BaseRepository
                     case "tax":
                         $value = $current_sheet->getCellByColumnAndRow($item['clo'], $row)->getFormattedValue();
                         if(strpos($value, "%") > 0) $value = (float)$value/100;
-                        $row_data[$item['key']] = $value;
+                        $content = $value;
                         break; 
                     case "money":
                         $res  = $current_sheet->getCellByColumnAndRow($item['clo'], $row)->getFormattedValue();
-                        $row_data[$item['key']] =  str_replace(['￥', ','], '', $res);//一般先取出结果，然后自己处理比较方便。
+                        $content =  str_replace(['￥', ','], '', $res);//一般先取出结果，然后自己处理比较方便。
                         break;
                     case "time":
                         $date = $current_sheet->getCellByColumnAndRow($item['clo'], $row)->getValue();
                         if(!$date){
-                            $row_data[$item['key']] = null;
+                            $content = null;
                         }else{
-                            $row_data[$item['key']] = gmdate('Y-m-d', ($date - 25569) * 24 * 3600); //gmdate返回UTC的时间
+                            $content = gmdate('Y-m-d', ($date - 25569) * 24 * 3600); //gmdate返回UTC的时间
                         }
                         break;*/
+                    case "start_date":
+                    case "end_date":
+                        $date = $current_sheet->getCellByColumnAndRow($item['clo'], $row)->getValue();
+                        if(!$date){
+                            $content = null;
+                        }else{
+                            $content = gmdate('Y-m-d', ($date - 25569) * 24 * 3600); //gmdate返回UTC的时间
+                        }
+                        break;
                     default :
                         $content= trim($current_sheet->getCellByColumnAndRow($item['clo'], $row)->getFormattedValue());
                 }
@@ -343,14 +351,39 @@ abstract class AbstractEloquentRepository implements BaseRepository
     protected function filterData($import_data)
     {
         foreach ($import_data as $key => $item){
-            $is_null = false;
+            $is_null = true;
             foreach ($item as $value) {
                 if(!empty($value)) {
-                    $is_null = true;break;
+                    $is_null = false;break;
                 }
             }
-            if($is_null == false ) unset($import_data[$key]);
+            if($is_null == true ) unset($import_data[$key]);
         }
         return array_values($import_data);
+    }
+
+    /**
+     * 上传文件，并返回文件的保存地址
+     * @param file 上传的文件
+     */
+    public function uploadFile($file){
+        //获取上传文件的类型
+        $fileextension = $file -> getClientOriginalExtension();
+        $allow_type = explode(",", env('UPLOAD_FILE_TYPE'));
+        if(!in_array($fileextension, $allow_type)){
+            return ['err_code' => 40001];
+        }
+        //获取上传文件的大小
+        $filesize=$file->getClientSize();
+        if($filesize > env('UPLOAD_MAX_SIZE')*1024*1024){
+            return ['err_code' => 40002];
+        }
+        //获取文件名称,并整理新名称，新名称规则为[filename+时间.扩展名]
+        $filename = $file->getClientOriginalName();
+        $filename = explode('.', $filename);
+        $savename = $filename[0] . date('YmdHis', time()) . '.' . $filename[1];
+        //将文件放到上传文件的目录
+        $path = $file->move(env('UPLOAD_DIR'),$savename);
+        return $path->getPathName();
     }
 }

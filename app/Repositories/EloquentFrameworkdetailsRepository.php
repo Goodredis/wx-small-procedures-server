@@ -31,9 +31,10 @@ class EloquentFrameworkdetailsRepository extends AbstractEloquentRepository impl
     /**
      * @inheritdoc
      */
-    public function findBy(array $searchCriteria = [], $operatorCriteria = [], $orderCriteria = 'framework_id,created_at desc')
+    public function findBy(array $searchCriteria = [], $operatorCriteria = [])
     {
-        return parent::findBy($searchCriteria, $operatorCriteria, $orderCriteria);
+        $searchCriteria['orderby'] = 'framework_id,created_at desc';
+        return parent::findBy($searchCriteria, $operatorCriteria);
     }
 
     /**

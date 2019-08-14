@@ -31,9 +31,10 @@ class EloquentSupplierRepository extends AbstractEloquentRepository implements S
     /**
      * @inheritdoc
      */
-    public function findBy(array $searchCriteria = [], $operatorCriteria = [], $orderCriteria = 'created_at')
+    public function findBy(array $searchCriteria = [], $operatorCriteria = [])
     {
-        return parent::findBy($searchCriteria, $operatorCriteria, $orderCriteria);
+        $searchCriteria['orderby'] = 'created_at desc';
+        return parent::findBy($searchCriteria, $operatorCriteria);
     }
 
     /**

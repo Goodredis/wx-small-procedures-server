@@ -182,9 +182,24 @@ class FrameworkController extends Controller
      * @param array $ids，合同框架表的id数组
      * @return \Illuminate\Http\JsonResponse|string
      */
-    public function destroymany(Request $request){
+    public function destroyMany(Request $request){
         $this->frameworkRepository->destroy($request->all());
         return response()->json(null, 204);
+    }
+
+    /**
+     * 导入合同框架信息
+     * @param Request $request
+     * 如果文件名带append则是增量导入
+     */
+    public function import(Request $request){
+        $file = $request->file('file');
+        $res = $this->frameworkRepository->importBasicInfo($file);
+        if(isset($res['err_code'])){
+            $res['message'] = trans('errorCode.' . $res['err_code']);
+            return response()->json($res, 415);
+        }
+        return response()->json(['result'=>'ok']);
     }
 
     /**

@@ -8,6 +8,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class EloquentFrameworkRepository extends AbstractEloquentRepository implements FrameworkRepository
 {
+
+    //导入的对应字典
+    private $format_column = array(
+        'basic' => array(
+            '名称' => 'name',
+            '编号' => 'code',
+            '生效日期' => 'start_date',
+            '截止日期' => 'end_date',
+            '框架类型' => 'type',
+            '税率' => 'tax_ratio',
+            '供应商' => 'supplier_code',
+            '税后价款' => 'price',
+            '含税价款' => 'price_with_tax',
+            '框架状态' => 'status'
+        ), 
+    );
     /*
      * 增加合同框架，可同时添加合同框架的详情
      */
@@ -54,9 +70,10 @@ class EloquentFrameworkRepository extends AbstractEloquentRepository implements 
      * 按条件查询信息列表
      * 默认有搜索del_flag位为0的条件，即没有删除的
      */
-    public function findBy(array $searchCriteria = [], $operatorCriteria = [], $orderCriteria = 'created_at desc'){
+    public function findBy(array $searchCriteria = [], $operatorCriteria = []){
+        $searchCriteria['orderby'] = 'created_at desc';
         $searchCriteria['del_flag'] = 0;
-        return parent::findBy($searchCriteria, $operatorCriteria, $orderCriteria);
+        return parent::findBy($searchCriteria, $operatorCriteria);
     }
 
     /**
@@ -84,8 +101,40 @@ class EloquentFrameworkRepository extends AbstractEloquentRepository implements 
     public function destroy($ids){
         foreach ($ids as $key => $id) {
             $framework = $this -> findOne($id);
-            $this ->delete($framework);
+            $this -> delete($framework);
         }
+    }
+
+    /**
+     * 导入框架基本信息
+     * @param $file 上传的文件
+     * 如果上传的文件名有append则是增量导入，否则是覆盖导入
+     */
+    public function importBasicInfo($file){
+        //上传文件，获取文件位置
+        $file_path = $this -> uploadFile($file);
+        if(isset($file_path['err_code'])){
+            return $file_path;
+        }
+        //获取导入的数组
+        $data = $this -> import($file_path, $this -> format_column['basic']);
+        if(isset($data['err_code'])){
+            return $data;
+        }
+
+        //获取文件名，如果有append则是增量导入
+        $patharr = explode('/',$file_path);
+        $file_name = array_pop($patharr);
+        //如果是覆盖导入就先清空表
+        if (strpos($file_name, 'append') === false){
+            $this -> model ->truncate();
+        }
+        //循环插入数据表
+        foreach ($data as $key => $value) {
+            $this -> save($value);
+        }
+
+        return true;
     }
 
 }
