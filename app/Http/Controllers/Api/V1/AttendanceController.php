@@ -151,8 +151,16 @@ class AttendanceController extends Controller
         return response()->json(null, 204);
     }
 
+    public function item(Request $request) {
+        $item = $this->attendanceviewRepository->getAttendanceviewItem($request->all());
+        if (!$item instanceof Attendanceview) {
+            return $this->sendNotFoundResponse("The attendance with uid {$id} doesn't exist");
+        }
+        return $this->respondWithItem($item, $this->attendanceviewTransformer);
+    }
+
     public function list(Request $request) {
-        $lists = $this->attendanceviewRepository->findBy($request->all());
+        $lists = $this->attendanceviewRepository->getAttendanceviewList($request->all());
         return $this->respondWithCollection($lists, $this->attendanceviewTransformer);
     }
 

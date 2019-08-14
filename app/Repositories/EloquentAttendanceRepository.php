@@ -36,12 +36,12 @@ class EloquentAttendanceRepository extends AbstractEloquentRepository implements
             $params['uid'] = trim($searchCriteria['uid']);
         }
         if (isset($searchCriteria['start_time']) && isset($searchCriteria['end_time'])) {
-            $params['check_in_at'] = $searchCriteria['start_time'] . "~" . $searchCriteria['end_time'];
-            $operatorCriteria['check_in_at'] = 'between';
+            $params['check_at'] = date('Ymd', $searchCriteria['start_time']) . "~" . date('Ymd', $searchCriteria['end_time']);
+            $operatorCriteria['check_at'] = 'between';
         }
-        if (isset($searchCriteria['orderby'])) {
-            $params['orderby'] = $searchCriteria['orderby'];
-        }
+        $params['orderby'] = isset($searchCriteria['orderby']) ? $searchCriteria['orderby'] : 'workdate DESC, check_at ASC';
+        $params['page'] = isset($searchCriteria['page']) ? $searchCriteria['page'] : 1;
+        $params['per_page'] = isset($searchCriteria['per_page']) ? $searchCriteria['per_page'] : 15;
         return parent::findBy($params, $operatorCriteria);
     }
 
