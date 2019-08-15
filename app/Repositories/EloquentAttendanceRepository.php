@@ -52,6 +52,23 @@ class EloquentAttendanceRepository extends AbstractEloquentRepository implements
         return parent::findOne($id);
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function delete(Model $model){
+        return parent::update($model, ['del_flag' => 1]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function destroy($ids){
+        foreach ($ids as $key => $id) {
+            $attendance = $this -> findOne($id);
+            $this -> delete($attendance);
+        }
+    }
+
     public function exportAttendance(array $export_data = []) {
         $lists = array();
         foreach ($export_data['data'] as $key => $value) {

@@ -65,8 +65,14 @@ class AttendanceController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
 	public function index(Request $request) {
-		$attendances = $this->attendanceRepository->findBy($request->all());
-        return $this->respondWithCollection($attendances, $this->attendanceTransformer);
+        $queryString = $request->all();
+        $attendances = $this->attendanceviewRepository->getAttendanceviewList($queryString);
+        $output = isset($queryString['output']) ? $queryString['output'] : 'json';
+        if ($output == 'json') {
+            return $this->respondWithCollection($attendances, $this->attendanceviewTransformer);
+        } elseif ($output == 'excel') {
+            $this->attendanceRepository->exportAttendance($attendances->toArray());
+        }
 	}
 
     /**
@@ -151,23 +157,28 @@ class AttendanceController extends Controller
         return response()->json(null, 204);
     }
 
-    public function item(Request $request) {
-        $item = $this->attendanceviewRepository->getAttendanceviewItem($request->all());
-        if (!$item instanceof Attendanceview) {
-            return $this->sendNotFoundResponse("The attendance with uid {$id} doesn't exist");
+    public function batch(Request $request){
+        $queryString = $request->all();
+        foreach ($queryString as $key => $item) {
+            switch ($key) { 
+                case 'create':
+                    # code...
+                    break;
+                case 'update':
+                    # code...
+                    break;
+                case 'delete':
+                    if(!empty($item)){
+                        $this->attendanceRepository->destroy(array_values($item));
+                    }
+                    return response()->json(null, 204);
+                    break;
+                default:
+                    return $this->sendCustomResponse(500, 'Error queryString format on batch of Attendance');
+                    break;
+            }
         }
-        return $this->respondWithItem($item, $this->attendanceviewTransformer);
-    }
-
-    public function list(Request $request) {
-        $lists = $this->attendanceviewRepository->getAttendanceviewList($request->all());
-        return $this->respondWithCollection($lists, $this->attendanceviewTransformer);
-    }
-
-    public function export(Request $request) {
-        $export_data = $this->attendanceviewRepository->findBy($request->all());
-        $attendances = $this->attendanceRepository->exportAttendance($export_data->toArray());
-        return $this->respondWithCollection($attendances, $this->attendanceTransformer);
+        exit;
     }
 
     /**

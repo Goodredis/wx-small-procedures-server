@@ -22,12 +22,12 @@ $api->version('v1', [
     // each route have a limit of 20 of 1 minutes
     'limit' => 20, 'expires' => 1,
 ], function ($api) {
-    // Auth
-    $api->get('attendances/item', 'AttendanceController@item');
-    $api->get('attendances/list', 'AttendanceController@list');
-    $api->get('attendances/export', 'AttendanceController@export');
-    $api->resources([ 'attendances' => 'AttendanceController' ]);
+    // 项目初始化测试
     $api->resources([ 'test' => 'TestController' ]);
+    // 人员考勤的批量操作
+    $api->post('attendances/batch', 'AttendanceController@batch');
+    // 人员考勤的增删改查
+    $api->resources([ 'attendances' => 'AttendanceController' ]);
     //合同框架的批量操作
     $api->post('framworkContracts/batch', 'FrameworkController@batch');
     //合同框架的导入

@@ -182,7 +182,7 @@ class FrameworkController extends Controller
      * @param Request $request
      * array(
      *     'delete'=>array(//批量删除
-     *         'ids'=>array('xxx','xxxx')//被删除的合同框架的id
+     *        'xxx','xxxx'//被删除的合同框架的id
      *     )
      *)
      * @return \Illuminate\Http\JsonResponse|string
@@ -192,9 +192,8 @@ class FrameworkController extends Controller
         foreach ($data as $key => $value) {
             switch ($key) {
                 case 'delete'://批量删除
-                    if(!empty($data['delete']['ids'])){
-                        $ids = $data['delete']['ids'];
-                        $this->frameworkRepository->destroy($ids);
+                    if(!empty($data['delete'])){
+                        $this->frameworkRepository->destroy($data['delete']);
                     }
                     return response()->json(null, 204);
                     break;
