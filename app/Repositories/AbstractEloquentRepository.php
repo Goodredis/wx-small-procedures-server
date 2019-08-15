@@ -262,7 +262,7 @@ abstract class AbstractEloquentRepository implements BaseRepository
                         if(!$date){
                             $content = null;
                         }else{
-                            $content = gmdate('Y-m-d', ($date - 25569) * 24 * 3600); //gmdate返回UTC的时间
+                            $content = gmdate('Ymd', ($date - 25569) * 24 * 3600); //gmdate返回UTC的时间
                         }
                         break;
                     default :
@@ -270,8 +270,10 @@ abstract class AbstractEloquentRepository implements BaseRepository
                 }
                 $row_data[$item['key']] = $content;
             }
-            if(count($row_data) != count($format_column))
-                throw new ApiException(Code::EXCEL_FORMAT_ERROR);
+
+            if(count($row_data) != count($format_column)){
+                return ['err_code' => 40004];
+            }
             //空数据过滤
             $import_data[] = $row_data;
         }

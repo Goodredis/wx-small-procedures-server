@@ -28,13 +28,16 @@ $api->version('v1', [
     $api->get('attendances/export', 'AttendanceController@export');
     $api->resources([ 'attendances' => 'AttendanceController' ]);
     $api->resources([ 'test' => 'TestController' ]);
-    //合同框架的批量删除
-    $api->post('frameworkContracts/batchdeletion', 'FrameworkController@destroyMany');
+    //合同框架的批量操作
+    $api->post('framworkContracts/batch', 'FrameworkController@batch');
     //合同框架的导入
-    $api->post('frameworkContracts/import', 'FrameworkController@import');
+    $api->post('framworkContracts/content', 'FrameworkController@import');
     //合同框架的增删改查
-    $api->resources([ 'frameworkContracts' => 'FrameworkController' ]);
-    $api->resources([ 'frameworkdetailsContracts' => 'FrameworkdetailsController' ]);
+    $api->resources([ 'framworkContracts' => 'FrameworkController' ]);
+    //合同框架详情的导入
+    $api->post('framworkContractDetails/content', 'FrameworkdetailsController@import');
+    //合同框架详情的增删改查
+    $api->resources([ 'framworkContractDetails' => 'FrameworkdetailsController' ]);
     //厂商的增删改查
-    $api->resources([ 'supplier' => 'SupplierController' ]);
+    $api->resources([ 'suppliers' => 'SupplierController' ]);
 });

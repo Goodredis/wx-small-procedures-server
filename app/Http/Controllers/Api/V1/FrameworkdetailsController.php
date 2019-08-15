@@ -154,6 +154,21 @@ class FrameworkdetailsController extends Controller
     }
 
     /**
+     * 导入合同框架的详情信息
+     * @param Request $request
+     * 如果文件名带append则是增量导入
+     */
+    public function import(Request $request){
+        $file = $request->file('file');
+        $res = $this->frameworkdetailsRepository->importDetailInfo($file);
+        if(isset($res['err_code'])){
+            $res['message'] = trans('errorCode.' . $res['err_code']);
+            return response()->json($res, 415);
+        }
+        return response()->json(['result'=>'ok']);
+    }
+
+    /**
      * Store Request Validation Rules
      *
      * @param Request $request

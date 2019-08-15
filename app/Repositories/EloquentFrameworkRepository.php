@@ -11,23 +11,27 @@ class EloquentFrameworkRepository extends AbstractEloquentRepository implements 
 
     //导入的对应字典
     private $format_column = array(
-        'basic' => array(
-            '名称' => 'name',
-            '编号' => 'code',
-            '生效日期' => 'start_date',
-            '截止日期' => 'end_date',
-            '框架类型' => 'type',
-            '税率' => 'tax_ratio',
-            '供应商' => 'supplier_code',
-            '税后价款' => 'price',
-            '含税价款' => 'price_with_tax',
-            '框架状态' => 'status'
-        ), 
+        '名称'     => 'name',
+        '编号'     => 'code',
+        '生效日期' => 'start_date',
+        '截止日期' => 'end_date',
+        '框架类型' => 'type',
+        '税率'     => 'tax_ratio',
+        '供应商'   => 'supplier_code',
+        '税后价款' => 'price',
+        '含税价款' => 'price_with_tax',
+        '框架状态' => 'status'
     );
     /*
      * 增加合同框架，可同时添加合同框架的详情
      */
     public function save(array $data, $generateUidFlag = true){
+        if(isset($data['start_date'])){
+            $data['start_date'] = date("Ymd",$data['start_date']);
+        }
+        if(isset($data['end_date'])){
+            $data['end_date'] = date("Ymd",$data['end_date']);
+        }
         //先创建合同框架
         $framework = parent::save($data, $generateUidFlag);
         //如果有合同框架详情就创建合同框架详情
@@ -71,7 +75,7 @@ class EloquentFrameworkRepository extends AbstractEloquentRepository implements 
      * 默认有搜索del_flag位为0的条件，即没有删除的
      */
     public function findBy(array $searchCriteria = [], $operatorCriteria = []){
-        $searchCriteria['orderby'] = 'created_at desc';
+        $searchCriteria['orderby'] = (isset($searchCriteria['orderby']) && !empty($searchCriteria['orderby'])) ? $searchCriteria['orderby'] : 'created_at desc';
         $searchCriteria['del_flag'] = 0;
         return parent::findBy($searchCriteria, $operatorCriteria);
     }
@@ -117,7 +121,7 @@ class EloquentFrameworkRepository extends AbstractEloquentRepository implements 
             return $file_path;
         }
         //获取导入的数组
-        $data = $this -> import($file_path, $this -> format_column['basic']);
+        $data = $this -> import($file_path, $this -> format_column);
         if(isset($data['err_code'])){
             return $data;
         }
@@ -129,11 +133,19 @@ class EloquentFrameworkRepository extends AbstractEloquentRepository implements 
         if (strpos($file_name, 'append') === false){
             $this -> model ->truncate();
         }
+        $error_data = array();
         //循环插入数据表
         foreach ($data as $key => $value) {
-            $this -> save($value);
+            $res = $this -> save($value);
+            if(!$res instanceof Framework){
+                $error_data['create_failed'][] = $value;
+            }
         }
-
+        if(!empty($error_data)){
+            return ['err_code' => 40005, 'error_data' => $error_data];
+        }
+        //删除文档
+        unlink($file_path);
         return true;
     }
 

@@ -177,14 +177,33 @@ class FrameworkController extends Controller
     }
 
     /**
-     * 批量删除合同框架
+     * 批量操作合同框架
      *
-     * @param array $ids，合同框架表的id数组
+     * @param Request $request
+     * array(
+     *     'delete'=>array(//批量删除
+     *         'ids'=>array('xxx','xxxx')//被删除的合同框架的id
+     *     )
+     *)
      * @return \Illuminate\Http\JsonResponse|string
      */
-    public function destroyMany(Request $request){
-        $this->frameworkRepository->destroy($request->all());
-        return response()->json(null, 204);
+    public function batch(Request $request){
+        $data = $request->all();
+        foreach ($data as $key => $value) {
+            switch ($key) {
+                case 'delete'://批量删除
+                    if(!empty($data['delete']['ids'])){
+                        $ids = $data['delete']['ids'];
+                        $this->frameworkRepository->destroy($ids);
+                    }
+                    return response()->json(null, 204);
+                    break;
+
+                default:
+                    return response()->json(['status' => 404, 'message' => '参数错误'], 404);
+                    break;
+            }
+        }
     }
 
     /**
@@ -212,8 +231,6 @@ class FrameworkController extends Controller
         $rules = [
             'name'                  => 'required|max:255',
             'code'                  => 'required|max:64',
-            'start_date'            => 'date',
-            'end_date'              => 'date',
             'tax_ratio'             => 'required',
             'type'                  => 'integer|in:1,2',
             'supplier_code'         => 'required|max:64',
@@ -233,8 +250,6 @@ class FrameworkController extends Controller
         $rules = [
             'name'                  => 'max:255',
             'code'                  => 'max:64',
-            'start_date'            => 'date',
-            'end_date'              => 'date',
             'type'                  => 'integer|in:1,2',
             'supplier_code'         => 'max:64',
             'frameworkdetails'      => 'array'
