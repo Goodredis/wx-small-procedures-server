@@ -14,7 +14,6 @@ class EloquentAttendanceRepository extends AbstractEloquentRepository implements
      * @inheritdoc
      */
     public function save(array $data, $generateUidFlag = true) {
-    	$data['del_flag'] = 0;
         return parent::save($data, $generateUidFlag);
     }
 

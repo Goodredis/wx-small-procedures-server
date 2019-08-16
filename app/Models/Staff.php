@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Attendance extends Model
+class Staff extends Model
 {
 
     /**
@@ -12,7 +12,7 @@ class Attendance extends Model
      *
      * @var string
      */
-    protected $table = 'attendance';
+    protected $table = 'staff';
 
     /**
      * Storage format of date field
@@ -28,14 +28,25 @@ class Attendance extends Model
      */
     protected $fillable = [
         'uid',
-        'remark',
+        'name',
+        'gender',
+        'level',
+        'mobile',
+        'email',
+        'birthday',
+        'idcard',
+        'password',
+        'company',
         'position',
-        'purpose',
-        'workdate',
-        'check_at',
-        'source',
-        'source_flag',
+        'type',
+        'label',
+        'status',
         'del_flag',
+        'highest_education',
+        'university',
+        'major',
+        'major_type',
+        'major_level'
     ];
 
     /**
@@ -44,7 +55,17 @@ class Attendance extends Model
      * @var array
      */
     protected $attributes = [
+        'status'   => 1,
         'del_flag' => 0
+    ];
+
+    /**
+     * The attributes excluded from the model's JSON form.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'password',
     ];
     
 }

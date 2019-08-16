@@ -28,6 +28,10 @@ $api->version('v1', [
     $api->post('attendances/batch', 'AttendanceController@batch');
     // 人员考勤的增删改查
     $api->resources([ 'attendances' => 'AttendanceController' ]);
+    // 人员管理的批量操作
+    $api->post('staffs/batch', 'StaffController@batch');
+    // 人员管理的增删改查
+    $api->resources([ 'staffs' => 'StaffController' ]);
     //合同框架的批量操作
     $api->post('framworkContracts/batch', 'FrameworkController@batch');
     //合同框架的导入

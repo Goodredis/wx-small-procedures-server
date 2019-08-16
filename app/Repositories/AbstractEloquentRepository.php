@@ -120,7 +120,9 @@ abstract class AbstractEloquentRepository implements BaseRepository
             $allValues = explode(',', $value);
             $betValues = explode('~', $value);
 
-            if (count($allValues) > 1) {
+            if (!empty($operatorCriteria[$key]) && $operatorCriteria[$key] == 'raw') {
+                $queryBuilder->whereRaw($value);
+            } elseif (count($allValues) > 1) {
                 $queryBuilder->whereIn($key, $allValues);
             } elseif (count($betValues) > 1 && $operatorCriteria[$key] == 'between') {
                 $queryBuilder->whereBetween($key, $betValues);
