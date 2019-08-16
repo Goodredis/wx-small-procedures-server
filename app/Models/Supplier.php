@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class supplier extends Model
+class Supplier extends Model
 {
     /**
      * 定义数据库表名
@@ -41,9 +41,20 @@ class supplier extends Model
     protected $fillable = [
         'name',        //'供应商名称',
         'code',        //'供应商编号',
+        'status',      //供应商状态，1正常，2禁用
         'created_at',  //'创建时间',
         'updated_at',  //'更新时间',
-        'del_flag',    //'是否删除，0未删除，1已删除',
+        'del_flag'    //'是否删除，0未删除，1已删除',
+    ];
+
+    /**
+     * 定义默认字段
+     *
+     * @var array
+     */
+    protected $attributes = [
+        'del_flag' => 0,
+        'status' => 1
     ];
 
     /**
@@ -51,6 +62,8 @@ class supplier extends Model
      */
     public function framework()
     {
-        return $this->hasMany('App\Models\Framework', 'supplier_code', 'code');
+        return $this->hasMany('App\Models\Framework', 'supplier_code', 'code')
+        -> where('del_flag',0)
+        -> orderBy('created_at', 'desc');
     }
 }

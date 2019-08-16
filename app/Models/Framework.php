@@ -60,6 +60,16 @@ class Framework extends Model
         'del_flag'       //'是否删除，0未删除，1已删除',
     ];
 
+    /**
+     * 定义默认字段
+     *
+     * @var array
+     */
+    protected $attributes = [
+        'del_flag' => 0,
+        'status' => 1
+    ];
+
 
     /**
      * 获取供应商
