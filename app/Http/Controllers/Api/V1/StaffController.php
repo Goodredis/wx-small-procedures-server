@@ -160,6 +160,16 @@ class StaffController extends Controller
         exit;
     }
 
+    public function import(Request $request){
+        $file = $request->file('file');
+        $res = $this->staffRepository->importStaffInfos($file);
+        if(isset($res['err_code'])){
+            $res['message'] = trans('errorCode.' . $res['err_code']);
+            return response()->json($res, 415);
+        }
+        return response()->json(['result'=>'ok']);
+    }
+
     /**
      * Store Request Validation Rules
      *
@@ -168,21 +178,26 @@ class StaffController extends Controller
      */
     private function storeRequestValidationRules(Request $request) {
         $rules = [
-            'uid'                   => 'string|required|max:36',
+            'uid'                   => '',
             'name'                  => 'max:255',
-            'pinyin'                => 'max:255',
+            'gender'                => 'max:1',
             'level'                 => 'max:1',
             'mobile'                => 'max:11',
             'email'                 => 'max:255',
+            'birthday'              => 'max:11',
+            'idcard'                => 'max:18',
             'password'              => 'max:64',
+            'employee_number'       => 'max:12',
             'company'               => 'max:64',
             'position'              => 'max:64',
             'type'                  => 'max:1',
             'label'                 => 'max:64',
             'status'                => 'max:1',
-            'createdAt'             => 'max:11',
-            'updatedAt'             => 'max:11',
-            'del_flag'              => 'max:1',
+            'highest_education'     => 'max:255',
+            'university'            => 'max:255',
+            'major'                 => 'max:255',
+            'major_type'            => 'max:255',
+            'major_level'           => 'max:255'
         ];
         return $rules;
     }
@@ -195,21 +210,25 @@ class StaffController extends Controller
      */
     private function updateRequestValidationRules(Request $request) {
         $rules = [
-            'uid'                   => '',
-            'name'                  => '',
-            'pinyin'                => 'max:255',
-            'level'                 => '',
-            'mobile'                => '',
-            'email'                 => '',
-            'password'              => '',
-            'company'               => '',
-            'position'              => '',
-            'type'                  => '',
-            'label'                 => '',
-            'status'                => '',
-            'createdAt'             => '',
-            'updatedAt'             => '',
-            'del_flag'              => '',
+            'name'                  => 'max:255',
+            'gender'                => 'max:1',
+            'level'                 => 'max:1',
+            'mobile'                => 'max:11',
+            'email'                 => 'max:255',
+            'birthday'              => 'max:11',
+            'idcard'                => 'max:18',
+            'password'              => 'max:64',
+            'employee_number'       => 'max:12',
+            'company'               => 'max:64',
+            'position'              => 'max:64',
+            'type'                  => 'max:1',
+            'label'                 => 'max:64',
+            'status'                => 'max:1',
+            'highest_education'     => 'max:255',
+            'university'            => 'max:255',
+            'major'                 => 'max:255',
+            'major_type'            => 'max:255',
+            'major_level'           => 'max:255'
         ];
 
         return $rules;

@@ -36,6 +36,7 @@ class Staff extends Model
         'birthday',
         'idcard',
         'password',
+        'employee_number',
         'company',
         'position',
         'type',
@@ -67,5 +68,9 @@ class Staff extends Model
     protected $hidden = [
         'password',
     ];
+
+    public function companydetails() {
+        return $this->belongsTo('App\Models\Supplier', 'company', 'code');
+    }
     
 }

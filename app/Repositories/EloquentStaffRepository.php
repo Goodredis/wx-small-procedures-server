@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use Ramsey\Uuid\Uuid;
 use App\Models\Staff;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Model;
@@ -9,6 +10,29 @@ use App\Repositories\Contracts\StaffRepository;
 
 class EloquentStaffRepository extends AbstractEloquentRepository implements StaffRepository
 {
+
+    // 导入字典
+    private $format_column = array(
+        '姓名'            =>     'name',
+        '性别'            =>     'gender',
+        '职级'            =>     'level',
+        '手机号'          =>     'mobile',
+        '邮箱'            =>     'email',
+        '出生日期'        =>     'birthday',
+        '身份证号'        =>     'idcard',
+        '登录密码'        =>     'password',
+        '员工编号'        =>     'employee_number',
+        '公司名称'        =>     'company',
+        '职位'            =>     'position',
+        '人员类型'        =>     'type',
+        '人员标签'        =>     'label',
+        '人员状态'        =>     'status',
+        '最高学历'        =>     'highest_education',
+        '毕业院校'        =>     'university',
+        '毕业专业'        =>     'major',
+        '专业类型'        =>     'major_type',
+        '专业等级'        =>     'major_level'
+    );
 
 	/*
      * @inheritdoc
@@ -75,6 +99,60 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
             $attendance = $this -> findOne($id);
             $this -> delete($attendance);
         }
+    }
+
+    public function importStaffInfos($file) {
+        $file_path = $this -> uploadFile($file);
+        if(isset($file_path['err_code'])){
+            return $file_path;
+        }
+        $data = $this -> import($file_path, $this -> format_column);
+        if(isset($data['err_code'])){
+            return $data;
+        }
+        $error_data = array();
+        foreach ($data as $key => $value) {
+            $value = $this->filterImportData($value);
+            $res = $this -> save($value);
+            if(!$res instanceof Staff){
+                $error_data['create_failed'][] = $value;
+            }
+        }
+        if(!empty($error_data)){
+            return ['err_code' => 40005, 'error_data' => $error_data];
+        }
+        //删除文档
+        @unlink($file_path);
+        return true;
+    }
+
+    private function filterImportData($data) {
+        if(isset($data['gender'])) {
+            $data['gender'] = $data['gender']=='男' ? 1 : 2;
+        }
+        if(isset($data['type'])) {
+            $data['type'] = $data['type']=='开发' ? 1 : 2;
+        }
+        if(isset($data['status'])) {
+            $data['status'] = $data['status']=='在职' ? 1 : 2;
+        }
+        $level = '';
+        switch ($data['level']) {
+            case '初级':
+                $level = 1;
+                break;
+            case '中级':
+                $level = 2;
+                break;
+            case '高级':
+                $level = 3;
+                break;
+        }
+        $data['level'] = $level;
+        $data['birthday'] = isset($data['birthday']) ? strtotime($data['birthday']) : '';
+        $data['company']  = isset($data['company'])  ? '351b1281-763e-41d9-a5e0-1b6ddd16ecdd' : '';
+        $data['position'] = isset($data['position']) ? 'manager' : '';
+        return $data;
     }
 
 }
