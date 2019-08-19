@@ -160,7 +160,7 @@ class FrameworkdetailsController extends Controller
      */
     public function import(Request $request){
         $file = $request->file('file');
-        $res = $this->frameworkdetailsRepository->importDetailInfo($file);
+        $res = $this->frameworkdetailsRepository->importFrameworkDetailInfo($file);
         if(isset($res['err_code'])){
             $res['message'] = trans('errorCode.' . $res['err_code']);
             return response()->json($res, 415);

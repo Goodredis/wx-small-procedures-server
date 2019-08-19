@@ -126,8 +126,65 @@ class SupplierController extends Controller
         return $this->respondWithItem($supplier, $this->supplierTransformer);
     }
 
+    /**
+     * 删除厂商
+     *
+     * @param str $id，厂商表的id
+     * @return \Illuminate\Http\JsonResponse|string
+     */
     public function destroy($id){
-        return str_random('32');exit;
+        $supplier = $this->supplierRepository->findOne($id);
+
+        if (!$supplier instanceof Supplier) {
+            return $this->sendNotFoundResponse("The Supplier with id {$id} doesn't exist");
+        }
+        $this->supplierRepository->delete($supplier);
+        return response()->json(null, 204);
+    }
+
+    /**
+     * 批量操作厂商
+     *
+     * @param Request $request
+     * array(
+     *     'method' => 'delete',//批量删除
+     *     'data'=>array(
+     *        'xxx','xxxx'//被删除的厂商的id
+     *     )
+     *)
+     * @return \Illuminate\Http\JsonResponse|string
+     */
+    public function batch(Request $request){
+        $params = $request->all();
+        $method = $params['method'];
+        $data = $params['data'];
+        switch ($method) {
+            case 'delete'://批量删除
+                if(!empty($data)){
+                    $this->supplierRepository->destroy($data);
+                }
+                return response()->json(null, 204);
+                break;
+
+            default:
+                return response()->json(['status' => 404, 'message' => '参数错误'], 404);
+                break;
+        }
+    }
+
+    /**
+     * 导入厂商信息
+     * @param Request $request
+     * 如果文件名带append则是增量导入
+     */
+    public function import(Request $request){
+        $file = $request->file('file');
+        $res = $this->supplierRepository->importSupplierBasicInfo($file);
+        if(isset($res['err_code'])){
+            $res['message'] = trans('errorCode.' . $res['err_code']);
+            return response()->json($res, 415);
+        }
+        return response()->json(['result'=>'ok']);
     }
 
     /**

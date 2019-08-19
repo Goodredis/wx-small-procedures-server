@@ -114,7 +114,7 @@ class EloquentFrameworkRepository extends AbstractEloquentRepository implements 
      * @param $file 上传的文件
      * 如果上传的文件名有append则是增量导入，否则是覆盖导入
      */
-    public function importBasicInfo($file){
+    public function importFrameworkBasicInfo($file){
         //上传文件，获取文件位置
         $file_path = $this -> uploadFile($file);
         if(isset($file_path['err_code'])){

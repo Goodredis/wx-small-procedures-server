@@ -42,6 +42,10 @@ $api->version('v1', [
     $api->post('framworkContractDetails/content', 'FrameworkdetailsController@import');
     //合同框架详情的增删改查
     $api->resources([ 'framworkContractDetails' => 'FrameworkdetailsController' ]);
+    //厂商的批量操作
+    $api->post('suppliers/batch', 'SupplierController@batch');
+    //厂商的导入
+    $api->post('suppliers/content', 'SupplierController@import');
     //厂商的增删改查
     $api->resources([ 'suppliers' => 'SupplierController' ]);
 });

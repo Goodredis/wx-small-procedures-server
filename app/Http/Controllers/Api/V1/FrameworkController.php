@@ -171,7 +171,6 @@ class FrameworkController extends Controller
         if (!$framework instanceof Framework) {
             return $this->sendNotFoundResponse("The Framework with id {$id} doesn't exist");
         }
-        //传false是为了做逻辑删除,即将del_flag位置为1
         $this->frameworkRepository->delete($framework);
         return response()->json(null, 204);
     }
@@ -181,27 +180,28 @@ class FrameworkController extends Controller
      *
      * @param Request $request
      * array(
-     *     'delete'=>array(//批量删除
+     *     'method' => 'delete',//批量删除
+     *     'data'=>array(
      *        'xxx','xxxx'//被删除的合同框架的id
      *     )
      *)
      * @return \Illuminate\Http\JsonResponse|string
      */
     public function batch(Request $request){
-        $data = $request->all();
-        foreach ($data as $key => $value) {
-            switch ($key) {
-                case 'delete'://批量删除
-                    if(!empty($data['delete'])){
-                        $this->frameworkRepository->destroy($data['delete']);
-                    }
-                    return response()->json(null, 204);
-                    break;
+        $params = $request->all();
+        $method = $params['method'];
+        $data = $params['data'];
+        switch ($method) {
+            case 'delete'://批量删除
+                if(!empty($data)){
+                    $this->frameworkRepository->destroy($data);
+                }
+                return response()->json(null, 204);
+                break;
 
-                default:
-                    return response()->json(['status' => 404, 'message' => '参数错误'], 404);
-                    break;
-            }
+            default:
+                return response()->json(['status' => 404, 'message' => '参数错误'], 404);
+                break;
         }
     }
 
@@ -212,7 +212,7 @@ class FrameworkController extends Controller
      */
     public function import(Request $request){
         $file = $request->file('file');
-        $res = $this->frameworkRepository->importBasicInfo($file);
+        $res = $this->frameworkRepository->importFrameworkBasicInfo($file);
         if(isset($res['err_code'])){
             $res['message'] = trans('errorCode.' . $res['err_code']);
             return response()->json($res, 415);
