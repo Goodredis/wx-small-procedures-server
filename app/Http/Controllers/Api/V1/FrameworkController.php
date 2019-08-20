@@ -197,11 +197,9 @@ class FrameworkController extends Controller
                     $this->frameworkRepository->destroy($data);
                 }
                 return response()->json(null, 204);
-                break;
 
             default:
                 return response()->json(['status' => 404, 'message' => '参数错误'], 404);
-                break;
         }
     }
 

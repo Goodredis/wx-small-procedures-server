@@ -116,7 +116,7 @@ class EloquentSupplierRepository extends AbstractEloquentRepository implements S
             return ['err_code' => 40005, 'error_data' => $error_data];
         }
         //删除文档
-        // unlink($file_path);
+        unlink($file_path);
         return true;
     }
 }

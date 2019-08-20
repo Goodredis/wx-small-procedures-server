@@ -107,6 +107,7 @@ $app->register(\Illuminate\Mail\MailServiceProvider::class);
 //$app->register(Dingo\Api\Provider\LaravelServiceProvider::class);
 $app->register(Dingo\Api\Provider\LumenServiceProvider::class);
 // LumenPassport::routes($app);
+$app->register(App\Providers\DingoServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
