@@ -70,7 +70,7 @@ class Staff extends Model
     ];
 
     public function companydetails() {
-        return $this->belongsTo('App\Models\Supplier', 'company', 'code');
+        return $this->belongsTo(Supplier::class, 'company', 'code');
     }
     
 }

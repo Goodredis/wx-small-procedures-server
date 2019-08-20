@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Api\V1;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Staff;
+use App\Models\Attendanceview;
 use App\Repositories\Contracts\StaffRepository;
+use App\Repositories\Contracts\AttendanceviewRepository;
 use App\Transformers\StaffTransformer;
+use App\Transformers\AttendanceviewTransformer;
 
 class StaffController extends Controller
 {
@@ -25,14 +28,32 @@ class StaffController extends Controller
     private $staffTransformer;
 
     /**
+     * Instance of AttendanceviewRepository
+     *
+     * @var AttendanceviewRepository
+     */
+    private $attendanceviewRepository;
+
+    /**
+     * Instanceof AttendanceviewTransformer
+     *
+     * @var AttendanceviewTransformer
+     */
+    private $attendanceviewTransformer;
+
+    /**
      * Constructor
      *
      * @param StaffRepository $staffRepository
      * @param StaffTransformer $staffTransformer
+     * @param AttendanceviewRepository $attendanceviewRepository
+     * @param AttendanceviewTransformer $attendanceviewTransformer
      */
-    public function __construct(StaffRepository $staffRepository, StaffTransformer $staffTransformer) {
+    public function __construct(StaffRepository $staffRepository, AttendanceviewRepository $attendanceviewRepository, StaffTransformer $staffTransformer, AttendanceviewTransformer $attendanceviewTransformer) {
         $this->staffRepository = $staffRepository;
         $this->staffTransformer = $staffTransformer;
+        $this->attendanceviewRepository = $attendanceviewRepository;
+        $this->attendanceviewTransformer = $attendanceviewTransformer;
         
         parent::__construct();
     }
@@ -158,6 +179,16 @@ class StaffController extends Controller
             }
         }
         exit;
+    }
+
+    /**
+     * @brief  获取人员考勤列表
+     * @param  string
+     * @return array
+     */
+    public function attendances($uid) {
+        $attendances = $this->attendanceviewRepository->getAttendanceviewList(array('uid' => $uid));
+        return $this->respondWithCollection($attendances, $this->attendanceviewTransformer);
     }
 
     public function import(Request $request){

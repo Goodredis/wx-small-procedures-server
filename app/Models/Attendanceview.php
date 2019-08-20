@@ -40,5 +40,9 @@ class Attendanceview extends Model
         'checkin_source_flag',
         'checkin_source_flag',
     ];
+
+    public function staff() {
+        return $this->belongsTo(Staff::class, 'uid', 'uid');
+    }
     
 }

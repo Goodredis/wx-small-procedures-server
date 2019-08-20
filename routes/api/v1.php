@@ -28,6 +28,8 @@ $api->version('v1', [
     $api->post('attendances/batch', 'AttendanceController@batch');
     // 人员考勤的增删改查
     $api->resources([ 'attendances' => 'AttendanceController' ]);
+    // 人员管理的考勤列表
+    $api->get('staffs/{uid}/attendances', 'StaffController@attendances');
     // 人员管理的批量操作
     $api->post('staffs/batch', 'StaffController@batch');
     // 人员管理的导入

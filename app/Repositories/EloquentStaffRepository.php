@@ -51,6 +51,34 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
         return parent::update($model, $data);
     }
     
+    /**
+     * @brief  通过名字获取用户信息
+     * @param  string  多个用逗号隔开
+     * @return array
+     */
+    public function getStaffInfoByNames($names) {
+        $staffs = parent::findBy(array('name' => $names))->toArray();
+        return !strpos($names, ",") ? array_pop($staffs['data']) : $staffs['data'];
+    }
+
+    /**
+     * @brief  通过ids获取用户信息
+     * @param  string | array
+     * @return array
+     */
+    public function getStaffInfoByUids($ids) {
+        $flag = true;
+        if (is_array($ids)) {
+            if (count($ids) > 1) {
+                $ids = implode(",", $ids);
+                $flag = false;
+            } else {
+                $ids = array_pop($ids);
+            }
+        }
+        $staffs = parent::findBy(array('uid' => $ids))->toArray();
+        return ($flag == true) ? array_pop($staffs['data']) : $staffs['data'];
+    }
 
 	/**
      * @inheritdoc
