@@ -9,7 +9,16 @@ class AttendanceviewTransformer extends TransformerAbstract
 {
     public function transform(Attendanceview $attendanceview) {
         $formattedAttendanceview = [
-            'uid'                   => $attendanceview->uid,
+            'staff'                 => [
+                    'uid'                 => $attendanceview->staff->uid,
+                    'name'                => $attendanceview->staff->name,
+                    'mobile'              => $attendanceview->staff->mobile,
+                    'email'               => $attendanceview->staff->email,
+                    'employee_number'     => $attendanceview->staff->employee_number,
+                    'company'             => $attendanceview->staff->companydetails,
+                    'position'            => $attendanceview->staff->position,
+                    'status'              => $attendanceview->staff->status
+                ],
             'workdate'              => strtotime($attendanceview->workdate),
             'checkin_remark'        => $attendanceview->checkin_remark,
             'checkout_remark'       => $attendanceview->checkout_remark,
