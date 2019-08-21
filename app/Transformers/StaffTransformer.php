@@ -29,9 +29,7 @@ class StaffTransformer extends TransformerAbstract
             'del_flag'              => $staff->del_flag,
             'highest_education'     => $staff->highest_education,
             'university'            => $staff->university,
-            'major'                 => $staff->major,
-            'major_type'            => $staff->major_type,
-            'major_level'           => $staff->major_level
+            'major'                 => $staff->major
         ];
 
         return $formattedStaff;

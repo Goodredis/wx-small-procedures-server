@@ -45,9 +45,7 @@ class Staff extends Model
         'del_flag',
         'highest_education',
         'university',
-        'major',
-        'major_type',
-        'major_level'
+        'major'
     ];
 
     /**

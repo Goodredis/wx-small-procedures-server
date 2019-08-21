@@ -226,9 +226,7 @@ class StaffController extends Controller
             'status'                => 'max:1',
             'highest_education'     => 'max:255',
             'university'            => 'max:255',
-            'major'                 => 'max:255',
-            'major_type'            => 'max:255',
-            'major_level'           => 'max:255'
+            'major'                 => 'max:255'
         ];
         return $rules;
     }
@@ -257,9 +255,7 @@ class StaffController extends Controller
             'status'                => 'max:1',
             'highest_education'     => 'max:255',
             'university'            => 'max:255',
-            'major'                 => 'max:255',
-            'major_type'            => 'max:255',
-            'major_level'           => 'max:255'
+            'major'                 => 'max:255'
         ];
 
         return $rules;

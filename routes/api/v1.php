@@ -36,6 +36,8 @@ $api->version('v1', [
     $api->post('staffs/content', 'StaffController@import');
     // 人员管理的增删改查
     $api->resources([ 'staffs' => 'StaffController' ]);
+    // 合同订单的增删改查
+    $api->resources([ 'contractOrders' => 'ContractorderController' ]);
     //合同框架的批量操作
     $api->post('framworkContracts/batch', 'FrameworkController@batch');
     //合同框架的导入
