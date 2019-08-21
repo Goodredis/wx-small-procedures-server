@@ -2,6 +2,8 @@
 
 namespace App\Repositories;
 
+use App\Tools\File;
+use App\Tools\Excel;
 use App\Repositories\Contracts\FrameworkdetailsRepository;
 use App\Models\Frameworkdetails;
 use App\Models\Framework;
@@ -63,12 +65,12 @@ class EloquentFrameworkdetailsRepository extends AbstractEloquentRepository impl
      */
     public function importFrameworkDetailInfo($file){
         //上传文件，获取文件位置
-        $file_path = $this -> uploadFile($file);
+        $file_path = File::upload($file);
         if(isset($file_path['err_code'])){
             return $file_path;
         }
         //获取导入的数组
-        $data = $this -> import($file_path, $this -> format_column);
+        $data = Excel::import($file_path, $this -> format_column);
         if(isset($data['err_code'])){
             return $data;
         }

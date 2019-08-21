@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Tools\Excel;
 use App\Models\Attendance;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Model;
@@ -79,7 +80,7 @@ class EloquentAttendanceRepository extends AbstractEloquentRepository implements
         }
         $format_column = array('日期', '姓名', '上班时间', '下班时间', '状态');
         $filename = '外协人员考勤信息';
-        parent::export($lists, $format_column, $filename);
+        Excel::export($lists, $format_column, $filename);
         exit;
     }
 

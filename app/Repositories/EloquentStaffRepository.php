@@ -2,6 +2,8 @@
 
 namespace App\Repositories;
 
+use App\Tools\File;
+use App\Tools\Excel;
 use Ramsey\Uuid\Uuid;
 use App\Models\Staff;
 use Illuminate\Support\Facades\Hash;
@@ -130,11 +132,11 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
     }
 
     public function importStaffInfos($file) {
-        $file_path = $this -> uploadFile($file);
+        $file_path = File::upload($file);
         if(isset($file_path['err_code'])){
             return $file_path;
         }
-        $data = $this -> import($file_path, $this -> format_column);
+        $data = Excel::import($file_path, $this -> format_column);
         if(isset($data['err_code'])){
             return $data;
         }

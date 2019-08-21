@@ -67,7 +67,4 @@ interface BaseRepository
      */
     public function delete(Model $model);
     
-    public function import($filePath, array $format_column);
-
-    public function export(array $export_data, array $format_column, $filename = '');
 }
