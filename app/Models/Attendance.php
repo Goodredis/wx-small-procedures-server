@@ -46,5 +46,9 @@ class Attendance extends Model
     protected $attributes = [
         'del_flag' => 0
     ];
+
+    public function staff() {
+        return $this->belongsTo(Staff::class, 'uid', 'uid');
+    }
     
 }

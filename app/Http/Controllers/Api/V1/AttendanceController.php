@@ -48,6 +48,7 @@ class AttendanceController extends Controller
      * @param AttendanceRepository $attendanceRepository
      * @param AttendanceviewRepository $attendanceviewRepository
      * @param AttendanceTransformer $attendanceTransformer
+     * @param AttendanceviewTransformer $attendanceviewTransformer
      */
     public function __construct(AttendanceRepository $attendanceRepository, AttendanceviewRepository $attendanceviewRepository, AttendanceTransformer $attendanceTransformer, AttendanceviewTransformer $attendanceviewTransformer) {
         $this->attendanceRepository = $attendanceRepository;
@@ -65,13 +66,13 @@ class AttendanceController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
 	public function index(Request $request) {
-        $queryString = $request->all();
-        $attendances = $this->attendanceviewRepository->getAttendanceviewList($queryString);
-        $output = isset($queryString['output']) ? $queryString['output'] : 'json';
+        $requestData = $request->all();
+        $attendances = $this->attendanceviewRepository->getAttendanceviewList($requestData);
+        $output = isset($requestData['output']) ? $requestData['output'] : 'json';
         if ($output == 'json') {
             return $this->respondWithCollection($attendances, $this->attendanceviewTransformer);
         } elseif ($output == 'excel') {
-            $this->attendanceRepository->exportAttendance($attendances->toArray());
+            $this->attendanceRepository->exportAttendances($attendances->toArray());
         }
 	}
 
@@ -82,13 +83,13 @@ class AttendanceController extends Controller
      * @return \Illuminate\Http\JsonResponse|string
      */
     public function show($id) {
-        $attendances = $this->attendanceRepository->findOne(intval($id));
+        $attendance = $this->attendanceRepository->getAttendanceItemById(intval($id));
 
-        if (!$attendances instanceof Attendance) {
-            return $this->sendNotFoundResponse("The attendances with id {$id} doesn't exist");
+        if (!$attendance instanceof Attendance) {
+            return $this->sendNotFoundResponse("The attendance with id {$id} doesn't exist");
         }
 
-        return $this->respondWithItem($attendances, $this->attendanceTransformer);
+        return $this->respondWithItem($attendance, $this->attendanceTransformer);
     }
 
     /**
@@ -129,7 +130,7 @@ class AttendanceController extends Controller
         if ($validatorResponse !== true) {
             return $this->sendInvalidFieldResponse($validatorResponse);
         }
-        $attendance = $this->attendanceRepository->findOne($id);
+        $attendance = $this->attendanceRepository->getAttendanceItemById($id);
         if (!$attendance instanceof Attendance) {
             return $this->sendNotFoundResponse("The attendance with id {$id} doesn't exist");
         }
@@ -146,7 +147,7 @@ class AttendanceController extends Controller
      * @return \Illuminate\Http\JsonResponse|string
      */
     public function destroy($id) {
-        $attendance = $this->attendanceRepository->findOne($id);
+        $attendance = $this->attendanceRepository->getAttendanceItemById($id);
 
         if (!$attendance instanceof Attendance) {
             return $this->sendNotFoundResponse("The attendance with id {$id} doesn't exist");
@@ -158,9 +159,9 @@ class AttendanceController extends Controller
     }
 
     public function batch(Request $request){
-        $queryString = $request->all();
-        foreach ($queryString as $key => $item) {
-            switch ($key) { 
+        $requestData = $request->all();
+        foreach ($requestData as $key => $value) {
+            switch ($value['method']) { 
                 case 'create':
                     # code...
                     break;
@@ -168,13 +169,13 @@ class AttendanceController extends Controller
                     # code...
                     break;
                 case 'delete':
-                    if(!empty($item)){
-                        $this->attendanceRepository->destroy(array_values($item));
+                    if(!empty($value['data'])){
+                        $this->attendanceRepository->destroy(array_values($value['data']));
                     }
                     return response()->json(null, 204);
                     break;
                 default:
-                    return $this->sendCustomResponse(500, 'Error queryString format on batch of Attendance');
+                    return $this->sendCustomResponse(500, 'Error requestData format on batch of Attendance');
                     break;
             }
         }
@@ -190,8 +191,7 @@ class AttendanceController extends Controller
     private function storeRequestValidationRules(Request $request) {
         $rules = [
             'uid'                   => 'string|required|max:36',
-            // 'uid'                   => 'uid|required|unique:users',
-            'remark'                => '',
+            'remark'                => 'max:255',
             'position'              => 'max:255',
             'purpose'               => 'max:1',
             'workdate'              => 'max:8',
@@ -210,17 +210,15 @@ class AttendanceController extends Controller
      */
     private function updateRequestValidationRules(Request $request) {
         $rules = [
-            'uid'                   => '',
-            // 'uid'                   => 'uid|required|unique:users',
+            'uid'                   => 'max:36',
             'remark'                => 'max:255',
             'position'              => 'max:255',
             'purpose'               => 'max:1',
-            'workdate'              => '',
+            'workdate'              => 'max:8',
             'check_at'              => 'max:11',
             'source'                => 'max:1',
             'source_flag'           => 'max:1',
         ];
-
         return $rules;
     }
 }

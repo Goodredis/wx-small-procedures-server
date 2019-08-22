@@ -5,6 +5,8 @@ namespace App\Repositories\Contracts;
 interface AttendanceRepository extends BaseRepository
 {
 
-	public function exportAttendance(array $export_data = []);
+	public function getAttendanceItemById($id);
+
+	public function exportAttendances(array $export_data = []);
 	
 }

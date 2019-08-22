@@ -10,24 +10,15 @@ use App\Repositories\Contracts\AttendanceviewRepository;
 class EloquentAttendanceviewRepository extends AbstractEloquentRepository implements AttendanceviewRepository
 {
 
-    /**
-     * @inheritdoc
-     */
-    public function getAttendanceviewItem(array $searchCriteria = []) {
-        return parent::findOneBy($searchCriteria);
-    }
-
 	/**
-     * @inheritdoc
+     * 获取考勤list
      */
-    public function getAttendanceviewList(array $searchCriteria = [], $operatorCriteria = []) {
-        $params = array();
-        if (isset($searchCriteria['uid'])) {
-            $params['uid'] = trim($searchCriteria['uid']);
-        }
+    public function getAttendanceviewList(array $searchCriteria = []) {
+        $operatorCriteria = array();
         if (isset($searchCriteria['start_time']) && isset($searchCriteria['end_time'])) {
-            $params['workdate'] = date('Ymd', $searchCriteria['start_time']) . "~" . date('Ymd', $searchCriteria['end_time']);
+            $searchCriteria['workdate'] = date('Ymd', $searchCriteria['start_time']) . "~" . date('Ymd', $searchCriteria['end_time']);
             $operatorCriteria['workdate'] = 'between';
+            unset($searchCriteria['start_time']); unset($searchCriteria['end_time']);
         }
         $params['orderby'] = isset($searchCriteria['orderby']) ? $searchCriteria['orderby'] : 'checkin_at ASC,checkout_at DESC';
         $params['page'] = isset($searchCriteria['page']) ? $searchCriteria['page'] : 1;
