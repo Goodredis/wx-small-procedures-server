@@ -14,9 +14,10 @@ class EloquentContractorderRepository extends AbstractEloquentRepository impleme
 {
 
 	/**
-     * @inheritdoc
+     * 获取合同订单List
      */
-    public function findBy(array $searchCriteria = [], $operatorCriteria = []) {
+    public function getContractOrderInfos(array $searchCriteria = []) {
+        $operatorCriteria = array();
         // 检索部门 Automation
     	// 检索订单名称
     	if (isset($searchCriteria['name'])) {
@@ -32,7 +33,23 @@ class EloquentContractorderRepository extends AbstractEloquentRepository impleme
         // 检索项目名称
         // 检索项目编号
         // 检索订单状态 Automation 
+        $searchCriteria['del_flag'] = 0;
         return parent::findBy($searchCriteria, $operatorCriteria);
+    }
+
+    /**
+     * 获取单条合同订单
+     */
+    public function getContractOrderInfoById($id) {
+        $criteria = array('id' => $id, 'del_flag' => 0);
+        return parent::findOneBy($criteria);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function delete(Model $model){
+        return parent::update($model, ['del_flag' => 1]);
     }
 
 }

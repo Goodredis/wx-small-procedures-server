@@ -8,21 +8,28 @@ class Contractorder extends Model
 {
 
     /**
-     * The database table used by the model.
+     * 合同订单表
      *
      * @var string
      */
     protected $table = 'contract_order';
 
     /**
-     * Storage format of date field
+     * 定义自动更新为时间戳格式
      *
      * @var string
      */
     protected $dateFormat = 'U';
 
     /**
-     * The attributes that are mass assignable.
+     * 定义主键非自增
+     *
+     * @var boolean
+     */
+    public $incrementing = false;
+
+    /**
+     * 定义Model返回的Columns
      *
      * @var array
      */
@@ -45,7 +52,7 @@ class Contractorder extends Model
     ];
 
     /**
-     * set default value of column
+     * 定义Columns的默认值
      *
      * @var array
      */
@@ -54,6 +61,9 @@ class Contractorder extends Model
         'del_flag' => 0
     ];
 
+    /**
+     * 定义反向关联关系
+     */
     public function frameworkInfo() {
         return $this->belongsTo(Framework::class, 'framework_id', 'id')
                     ->where('status', 1)

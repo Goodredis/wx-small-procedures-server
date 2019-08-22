@@ -24,10 +24,10 @@ class ContractorderTransformer extends TransformerAbstract
             'tax_ratio'             => $contractorder->tax_ratio,
             'price'                 => $contractorder->price,
             'price_with_tax'        => $contractorder->price_with_tax,
-            'status'                => $contractorder->status,
+            'status'                => intval($contractorder->status),
             'created_at'            => strtotime($contractorder->created_at),
             'updated_at'            => strtotime($contractorder->updated_at),
-            'del_flag'              => $contractorder->del_flag,
+            'del_flag'              => intval($contractorder->del_flag),
         ];
 
         return $formattedContractorder;

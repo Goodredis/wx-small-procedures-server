@@ -44,14 +44,48 @@ class ContractorderController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
 	public function index(Request $request) {
-        $queryString = $request->all();
-        $staffs = $this->contractorderRepository->findBy($queryString);
-        $output = isset($queryString['output']) ? $queryString['output'] : 'json';
+        $requestData = $request->all();
+        $orders = $this->contractorderRepository->getContractOrderInfos($requestData);
+        $output = isset($requestData['output']) ? $requestData['output'] : 'json';
         if ($output == 'json') {
-            return $this->respondWithCollection($staffs, $this->contractorderTransformer);
+            return $this->respondWithCollection($orders, $this->contractorderTransformer);
         } elseif ($output == 'excel') {
-            $this->contractorderRepository->exportContractorders($staffs->toArray());
+            $this->contractorderRepository->exportContractorders($orders->toArray());
         }
 	}
+
+    /**
+     * Display the specified rpesource.
+     *
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse|string
+     */
+    public function show($id) {
+        $order = $this->contractorderRepository->getContractOrderInfoById($id);
+
+        if (!$order instanceof Contractorder) {
+            return $this->sendNotFoundResponse("The contract order with id {$id} doesn't exist");
+        }
+
+        return $this->respondWithItem($order, $this->contractorderTransformer);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse|string
+     */
+    public function destroy($id) {
+        $order = $this->contractorderRepository->getContractOrderInfoById($id);
+
+        if (!$order instanceof Contractorder) {
+            return $this->sendNotFoundResponse("The contract order with id {$id} doesn't exist");
+        }
+
+        $this->contractorderRepository->delete($order);
+
+        return response()->json(null, 204);
+    }
 
 }
