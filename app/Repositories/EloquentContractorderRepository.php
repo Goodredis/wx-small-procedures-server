@@ -131,7 +131,7 @@ class EloquentContractorderRepository extends AbstractEloquentRepository impleme
             }
         }
         if(!empty($error_data)){
-            return ['err_code' => 11005, 'error_data' => $error_data];
+            return ['err_code' => 110005, 'error_data' => $error_data];
         }
         //删除文档
         unlink($file_path);

@@ -105,6 +105,7 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
             $operatorCriteria['label'] = 'raw';
         }
         $searchCriteria['del_flag'] = 0;
+        $searchCriteria['orderby'] = isset($searchCriteria['orderby']) ? $searchCriteria['orderby'] : 'checkin_at ASC, checkout_at DESC';
         return parent::findBy($searchCriteria, $operatorCriteria);
     }
 
@@ -157,7 +158,7 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
             }
         }
         if(!empty($error_data)){
-            return ['err_code' => 11005, 'error_data' => $error_data];
+            return ['err_code' => 110005, 'error_data' => $error_data];
         }
         //删除文档
         @unlink($file_path);

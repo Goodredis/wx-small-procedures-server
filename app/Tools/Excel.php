@@ -40,7 +40,7 @@ class Excel
         $lines       = $highestRow - 1;
         if ($lines <= 0) {
             // var_dump('Excel表格中没有数据');exit;
-            throw new Exception(trans('errorCode.11003'), 11003);
+            throw new Exception(trans('errorCode.110003'), 110003);
         }
 
         for ($col = 1; $col <= $highestColumnIndex; ++$col) //列数是以A列开始
@@ -92,7 +92,7 @@ class Excel
             }
 
             if(count($row_data) != count($format_column)){
-                throw new Exception(trans('errorCode.11004'), 11004);
+                throw new Exception(trans('errorCode.110004'), 110004);
             }
             //空数据过滤
             $import_data[] = $row_data;

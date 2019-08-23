@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use Exception;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
@@ -159,25 +160,25 @@ class AttendanceController extends Controller
     }
 
     public function batch(Request $request){
-        $requestData = $request->all();
-        foreach ($requestData as $key => $value) {
-            switch ($value['method']) { 
-                case 'create':
-                    # code...
-                    break;
-                case 'update':
-                    # code...
-                    break;
-                case 'delete':
-                    if(!empty($value['data'])){
-                        $this->attendanceRepository->destroy(array_values($value['data']));
-                    }
-                    return response()->json(null, 204);
-                    break;
-                default:
-                    return $this->sendCustomResponse(500, 'Error requestData format on batch of Attendance');
-                    break;
-            }
+        $method = $request->post('method');
+        $data = $request->post('data');
+        if (empty($method) || empty($data) || !is_array($data)) {
+            throw new Exception(trans('errorCode.120001'), 120001); 
+        }
+        switch ($method) { 
+            case 'create':
+                # code...
+                break;
+            case 'update':
+                # code...
+                break;
+            case 'delete':
+                $this->attendanceRepository->destroy(array_values($data));
+                return response()->json(null, 204);
+                break;
+            default:
+                return $this->sendCustomResponse(500, 'Error requestData format on batch of Attendance');
+                break;
         }
         exit;
     }
