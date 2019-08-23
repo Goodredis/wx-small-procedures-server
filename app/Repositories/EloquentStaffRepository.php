@@ -133,13 +133,9 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
 
     public function importStaffInfos($file) {
         $file_path = File::upload($file);
-        if(isset($file_path['err_code'])){
-            return $file_path;
-        }
+
         $data = Excel::import($file_path, $this -> format_column);
-        if(isset($data['err_code'])){
-            return $data;
-        }
+
         $error_data = array();
         foreach ($data as $key => $value) {
             $value = $this->filterImportData($value);
@@ -149,7 +145,7 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
             }
         }
         if(!empty($error_data)){
-            return ['err_code' => 40005, 'error_data' => $error_data];
+            return ['err_code' => 11005, 'error_data' => $error_data];
         }
         //删除文档
         @unlink($file_path);

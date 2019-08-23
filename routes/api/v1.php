@@ -24,10 +24,12 @@ $api->version('v1', [
 ], function ($api) {
     // 项目初始化测试
     $api->resources([ 'test' => 'TestController' ]);
+
     // 人员考勤的批量操作
     $api->post('attendances/batch', 'AttendanceController@batch');
     // 人员考勤的增删改查
     $api->resources([ 'attendances' => 'AttendanceController' ]);
+
     // 人员管理的考勤列表
     $api->get('staffs/{uid}/attendances', 'StaffController@attendances');
     // 人员管理的批量操作
@@ -36,18 +38,24 @@ $api->version('v1', [
     $api->post('staffs/content', 'StaffController@import');
     // 人员管理的增删改查
     $api->resources([ 'staffs' => 'StaffController' ]);
+
+    // 合同订单的导入
+    $api->post('contractOrders/content', 'ContractorderController@import');
     // 合同订单的增删改查
     $api->resources([ 'contractOrders' => 'ContractorderController' ]);
+
     //合同框架的批量操作
     $api->post('framworkContracts/batch', 'FrameworkController@batch');
     //合同框架的导入
     $api->post('framworkContracts/content', 'FrameworkController@import');
     //合同框架的增删改查
     $api->resources([ 'framworkContracts' => 'FrameworkController' ]);
+
     //合同框架详情的导入
     $api->post('framworkContractDetails/content', 'FrameworkdetailsController@import');
     //合同框架详情的增删改查
     $api->resources([ 'framworkContractDetails' => 'FrameworkdetailsController' ]);
+
     //厂商的批量操作
     $api->post('suppliers/batch', 'SupplierController@batch');
     //厂商的导入

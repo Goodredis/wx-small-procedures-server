@@ -7,6 +7,10 @@ use League\Fractal\TransformerAbstract;
 
 class FrameworkTransformer extends TransformerAbstract
 {
+    protected $defaultIncludes = [
+        'supplier',
+        'details'
+    ];
     public function transform(Framework $framework)
     {
         $formattedFramework = [
@@ -20,8 +24,6 @@ class FrameworkTransformer extends TransformerAbstract
             'price'          => $framework->price,
             'price_with_tax' => $framework->price_with_tax,
             'supplier_code'  => $framework->supplier_code,
-            'supplier'       => $framework->supplier,
-            'details'        => $framework->frameworkdetails,
             'status'         => $framework->status,
             'created_at'     => (string)$framework->created_at,
             'updated_at'     => (string)$framework->updated_at,
@@ -29,5 +31,31 @@ class FrameworkTransformer extends TransformerAbstract
         ];
 
         return $formattedFramework;
+    }
+
+    /**
+     * @brief 通过合同框架详情信息的transformer包含合同框架的详情信息
+     * @param model framework
+     * @return \League\Fractal\Resource\Collection
+     */
+    public function includeDetails(Framework $framework)
+    {
+        $frameworkdetails = $framework->frameworkdetails;
+        $frameworkdetailsTransformer = new FrameworkdetailsTransformer();
+        $frameworkdetailsTransformer -> setDefaultIncludes([]);
+        return $this->collection($frameworkdetails,$frameworkdetailsTransformer);
+    }
+
+    /**
+     * @brief 通过厂商基本信息的transformer包含厂商的基本信息
+     * @param model framework
+     * @return \League\Fractal\Resource\Item
+     */
+    public function includeSupplier(Framework $framework)
+    {
+        $supplier = $framework->supplier;
+        $supplierTransformer = new SupplierTransformer();
+        $supplierTransformer -> setDefaultIncludes([]);
+        return $this->item($supplier,$supplierTransformer);
     }
 }

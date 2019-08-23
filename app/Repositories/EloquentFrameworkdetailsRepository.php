@@ -21,6 +21,18 @@ class EloquentFrameworkdetailsRepository extends AbstractEloquentRepository impl
         '类型'         => 'type',
         '职级'         => 'level'
     );
+    //框架详情类型、职级对应字典
+    private $string_map = array(
+        'type' => [
+            '开发' => 1,
+            '测试' => 2
+        ],
+        'level' => [
+            '初级' => 1,
+            '中级' => 2,
+            '高级' => 3
+        ]
+    );
 
     /*
      * @inheritdoc
@@ -66,14 +78,9 @@ class EloquentFrameworkdetailsRepository extends AbstractEloquentRepository impl
     public function importFrameworkDetailInfo($file){
         //上传文件，获取文件位置
         $file_path = File::upload($file);
-        if(isset($file_path['err_code'])){
-            return $file_path;
-        }
+
         //获取导入的数组
         $data = Excel::import($file_path, $this -> format_column);
-        if(isset($data['err_code'])){
-            return $data;
-        }
 
         //获取文件名，如果有append则是增量导入
         $patharr = explode('/',$file_path);
@@ -99,13 +106,15 @@ class EloquentFrameworkdetailsRepository extends AbstractEloquentRepository impl
                 $framework_ids[$value['framework_id']] = $info['id'];
             }
             $value['framework_id'] = $framework_ids[$value['framework_id']];
+            $value['type'] = isset($this -> string_map['type'][$value['type']]) ? $this -> string_map['type'][$value['type']] : $value['type'];
+            $value['level'] = isset($this -> string_map['level'][$value['level']]) ? $this -> string_map['level'][$value['level']] : $value['level'];
             $res = $this -> save($value);
             if(!$res instanceof Frameworkdetails){
                 $error_data['create_failed'][] = $value;
             }
         }
         if(!empty($error_data)){
-            return ['err_code' => 40005, 'error_data' => $error_data];
+            return ['err_code' => 11005, 'error_data' => $error_data];
         }
         //删除文档
         unlink($file_path);

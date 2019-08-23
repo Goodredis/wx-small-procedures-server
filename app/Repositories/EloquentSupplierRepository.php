@@ -71,7 +71,7 @@ class EloquentSupplierRepository extends AbstractEloquentRepository implements S
     }
 
     /**
-     * 批量删除，将厂商的合同框架的删除(del_flag置为1)，不删除框架详情信息
+     * @brief  批量删除，将厂商的合同框架的删除(del_flag置为1)，不删除框架详情信息
      * 逻辑删除，将del_flag位置为1
      * @param array $ids，注意id必须是数组，即使只有一个元素也得是数组格式
     */
@@ -83,21 +83,16 @@ class EloquentSupplierRepository extends AbstractEloquentRepository implements S
     }
 
     /**
-     * 导入框厂商信息
+     * @brief  导入厂商信息
      * @param $file 上传的文件
      * 如果上传的文件名有append则是增量导入，否则是覆盖导入
      */
     public function importSupplierBasicInfo($file){
         //上传文件，获取文件位置
         $file_path = File::upload($file);
-        if(isset($file_path['err_code'])){
-            return $file_path;
-        }
+
         //获取导入的数组
         $data = Excel::import($file_path, $this -> format_column);
-        if(isset($data['err_code'])){
-            return $data;
-        }
 
         //获取文件名，如果有append则是增量导入
         $patharr = explode('/',$file_path);
@@ -115,10 +110,20 @@ class EloquentSupplierRepository extends AbstractEloquentRepository implements S
             }
         }
         if(!empty($error_data)){
-            return ['err_code' => 40005, 'error_data' => $error_data];
+            return ['err_code' => 11005, 'error_data' => $error_data];
         }
         //删除文档
         unlink($file_path);
         return true;
+    }
+
+    /**
+     * @brief  通过厂商名称获取厂商基本信息
+     * @param  string names 多个用逗号隔开
+     * @return array
+     */
+    public function getSupplierInfoByNames($names) {
+        $supplier = parent::findBy(array('name' => $names))->toArray();
+        return !strpos($names, ",") ? array_pop($supplier['data']) : $supplier['data'];
     }
 }

@@ -24,15 +24,26 @@ class EloquentFrameworkRepository extends AbstractEloquentRepository implements 
         '含税价款' => 'price_with_tax',
         '框架状态' => 'status'
     );
+    //框架状态、类型对应字典
+    private $string_map = array(
+        'type' => [
+            '开发' => 1,
+            '测试' => 2
+        ],
+        'status' => [
+            '执行中' => 1,
+            '已完成' => 2
+        ]
+    );
     /*
      * 增加合同框架，可同时添加合同框架的详情
      */
     public function save(array $data, $generateUidFlag = true){
         if(isset($data['start_date'])){
-            $data['start_date'] = date("Ymd",$data['start_date']);
+            $data['start_date'] = date("Ymd",strtotime($data['start_date']));
         }
         if(isset($data['end_date'])){
-            $data['end_date'] = date("Ymd",$data['end_date']);
+            $data['end_date'] = date("Ymd",strtotime($data['end_date']));
         }
         //先创建合同框架
         $framework = parent::save($data, $generateUidFlag);
@@ -119,14 +130,9 @@ class EloquentFrameworkRepository extends AbstractEloquentRepository implements 
     public function importFrameworkBasicInfo($file){
         //上传文件，获取文件位置
         $file_path = File::upload($file);
-        if(isset($file_path['err_code'])){
-            return $file_path;
-        }
+
         //获取导入的数组
         $data = Excel::import($file_path, $this -> format_column);
-        if(isset($data['err_code'])){
-            return $data;
-        }
 
         //获取文件名，如果有append则是增量导入
         $patharr = explode('/',$file_path);
@@ -138,17 +144,28 @@ class EloquentFrameworkRepository extends AbstractEloquentRepository implements 
         $error_data = array();
         //循环插入数据表
         foreach ($data as $key => $value) {
+            $value['type'] = isset($this -> string_map['type'][$value['type']]) ? $this -> string_map['type'][$value['type']] : $value['type'];
+            $value['status'] = isset($this -> string_map['status'][$value['status']]) ? $this -> string_map['status'][$value['status']] : $value['status'];
             $res = $this -> save($value);
             if(!$res instanceof Framework){
                 $error_data['create_failed'][] = $value;
             }
         }
         if(!empty($error_data)){
-            return ['err_code' => 40005, 'error_data' => $error_data];
+            return ['err_code' => 11005, 'error_data' => $error_data];
         }
         //删除文档
         unlink($file_path);
         return true;
     }
 
+    /**
+     * @brief  通过框架名称获取框架基本信息
+     * @param  string names 多个用逗号隔开
+     * @return array
+     */
+    public function getFrameworkInfoByNames($names) {
+        $framework = parent::findBy(array('name' => $names))->toArray();
+        return !strpos($names, ",") ? array_pop($framework['data']) : $framework['data'];
+    }
 }
