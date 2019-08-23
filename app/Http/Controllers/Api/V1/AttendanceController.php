@@ -168,17 +168,13 @@ class AttendanceController extends Controller
         switch ($method) { 
             case 'create':
                 # code...
-                break;
             case 'update':
                 # code...
-                break;
             case 'delete':
                 $this->attendanceRepository->destroy(array_values($data));
                 return response()->json(null, 204);
-                break;
             default:
                 return $this->sendCustomResponse(500, 'Error requestData format on batch of Attendance');
-                break;
         }
         exit;
     }

@@ -105,7 +105,7 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
             $operatorCriteria['label'] = 'raw';
         }
         $searchCriteria['del_flag'] = 0;
-        $searchCriteria['orderby'] = isset($searchCriteria['orderby']) ? $searchCriteria['orderby'] : 'checkin_at ASC, checkout_at DESC';
+        $searchCriteria['orderby'] = isset($searchCriteria['orderby']) ? $searchCriteria['orderby'] : 'created_at DESC';
         return parent::findBy($searchCriteria, $operatorCriteria);
     }
 
