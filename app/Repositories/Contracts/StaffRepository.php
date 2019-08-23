@@ -11,4 +11,6 @@ interface StaffRepository extends BaseRepository
 
 	public function getStaffInfoByUids($ids);
 
+	public function getStaffItemById($id);
+
 }

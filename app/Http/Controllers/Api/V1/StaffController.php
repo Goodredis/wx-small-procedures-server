@@ -65,13 +65,13 @@ class StaffController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
 	public function index(Request $request) {
-        $queryString = $request->all();
-        $staffs = $this->staffRepository->findBy($queryString);
-        $output = isset($queryString['output']) ? $queryString['output'] : 'json';
+        $requestData = $request->all();
+        $staffs = $this->staffRepository->findBy($requestData);
+        $output = isset($requestData['output']) ? $requestData['output'] : 'json';
         if ($output == 'json') {
             return $this->respondWithCollection($staffs, $this->staffTransformer);
         } elseif ($output == 'excel') {
-            $this->staffRepository->exportAttendance($staffs->toArray());
+            # code...
         }
 	}
 
@@ -82,7 +82,7 @@ class StaffController extends Controller
      * @return \Illuminate\Http\JsonResponse|string
      */
     public function show($id) {
-        $staff = $this->staffRepository->findOne(intval($id));
+        $staff = $this->staffRepository->getStaffItemById(intval($id));
 
         if (!$staff instanceof Staff) {
             return $this->sendNotFoundResponse("The staff with id {$id} doesn't exist");
@@ -129,7 +129,7 @@ class StaffController extends Controller
         if ($validatorResponse !== true) {
             return $this->sendInvalidFieldResponse($validatorResponse);
         }
-        $staff = $this->staffRepository->findOne($id);
+        $staff = $this->staffRepository->getStaffItemById($id);
         if (!$staff instanceof Staff) {
             return $this->sendNotFoundResponse("The staff with id {$id} doesn't exist");
         }
@@ -146,7 +146,7 @@ class StaffController extends Controller
      * @return \Illuminate\Http\JsonResponse|string
      */
     public function destroy($id) {
-        $staff = $this->staffRepository->findOne($id);
+        $staff = $this->staffRepository->getStaffItemById($id);
 
         if (!$staff instanceof Staff) {
             return $this->sendNotFoundResponse("The staff with id {$id} doesn't exist");
@@ -158,9 +158,9 @@ class StaffController extends Controller
     }
 
     public function batch(Request $request){
-        $queryString = $request->all();
-        foreach ($queryString as $key => $item) {
-            switch ($key) { 
+        $requestData = $request->all();
+        foreach ($requestData as $key => $value) {
+            switch ($value['method']) { 
                 case 'create':
                     # code...
                     break;
@@ -168,13 +168,13 @@ class StaffController extends Controller
                     # code...
                     break;
                 case 'delete':
-                    if(!empty($item)){
-                        $this->staffRepository->destroy(array_values($item));
+                    if(!empty($value['data'])){
+                        $this->staffRepository->destroy(array_values($value['data']));
                     }
                     return response()->json(null, 204);
                     break;
                 default:
-                    return $this->sendCustomResponse(500, 'Error queryString format on batch of Attendance');
+                    return $this->sendCustomResponse(500, 'Error requestData format on batch of Attendance');
                     break;
             }
         }
@@ -257,7 +257,6 @@ class StaffController extends Controller
             'university'            => 'max:255',
             'major'                 => 'max:255'
         ];
-
         return $rules;
     }
 }

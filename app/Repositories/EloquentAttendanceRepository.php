@@ -31,14 +31,12 @@ class EloquentAttendanceRepository extends AbstractEloquentRepository implements
      * @inheritdoc
      */
     public function findBy(array $searchCriteria = [], $operatorCriteria = []) {
-        $params = array();
-        if (isset($searchCriteria['uid'])) {
-            $params['uid'] = trim($searchCriteria['uid']);
-        }
         if (isset($searchCriteria['start_time']) && isset($searchCriteria['end_time'])) {
-            $params['check_at'] = date('Ymd', $searchCriteria['start_time']) . "~" . date('Ymd', $searchCriteria['end_time']);
-            $operatorCriteria['check_at'] = 'between';
+            $searchCriteria['workdate'] = date('Ymd', $searchCriteria['start_time']) . "~" . date('Ymd', $searchCriteria['end_time']);
+            $operatorCriteria['workdate'] = 'between';
+            unset($searchCriteria['start_time']); unset($searchCriteria['end_time']);
         }
+        $searchCriteria['del_flag'] = 0;
         $params['orderby'] = isset($searchCriteria['orderby']) ? $searchCriteria['orderby'] : 'workdate DESC, check_at ASC';
         $params['page'] = isset($searchCriteria['page']) ? $searchCriteria['page'] : 1;
         $params['per_page'] = isset($searchCriteria['per_page']) ? $searchCriteria['per_page'] : 15;
@@ -48,8 +46,9 @@ class EloquentAttendanceRepository extends AbstractEloquentRepository implements
     /**
      * @inheritdoc
      */
-    public function findOne($id) {
-        return parent::findOne($id);
+    public function getAttendanceItemById($id) {
+        $criteria = array('id' => $id, 'del_flag' => 0);
+        return parent::findOneBy($criteria);
     }
 
     /**
@@ -64,12 +63,12 @@ class EloquentAttendanceRepository extends AbstractEloquentRepository implements
      */
     public function destroy($ids){
         foreach ($ids as $key => $id) {
-            $attendance = $this -> findOne($id);
+            $attendance = $this -> getAttendanceItemById($id);
             $this -> delete($attendance);
         }
     }
 
-    public function exportAttendance(array $export_data = []) {
+    public function exportAttendances(array $export_data = []) {
         $lists = array();
         foreach ($export_data['data'] as $key => $value) {
             $lists[$key]['date'] = $value['workdate'];

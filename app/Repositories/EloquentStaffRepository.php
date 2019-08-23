@@ -59,7 +59,7 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
      * @return array
      */
     public function getStaffInfoByNames($names) {
-        $staffs = parent::findBy(array('name' => $names))->toArray();
+        $staffs = parent::findBy(array('name' => $names, 'del_flag' => 0))->toArray();
         return !strpos($names, ",") ? array_pop($staffs['data']) : $staffs['data'];
     }
 
@@ -78,7 +78,7 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
                 $ids = array_pop($ids);
             }
         }
-        $staffs = parent::findBy(array('uid' => $ids))->toArray();
+        $staffs = parent::findBy(array('uid' => $ids, 'del_flag' => 0))->toArray();
         return ($flag == true) ? array_pop($staffs['data']) : $staffs['data'];
     }
 
@@ -104,14 +104,16 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
             $searchCriteria['label'] = $label;
             $operatorCriteria['label'] = 'raw';
         }
+        $searchCriteria['del_flag'] = 0;
         return parent::findBy($searchCriteria, $operatorCriteria);
     }
 
     /**
      * @inheritdoc
      */
-    public function findOne($id) {
-        return parent::findOne($id);
+    public function getStaffItemById($id) {
+        $criteria = array('id' => $id, 'del_flag' => 0);
+        return parent::findOneBy($criteria);
     }
 
     /**
