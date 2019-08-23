@@ -156,7 +156,7 @@ class AttendanceController extends Controller
 
         $this->attendanceRepository->delete($attendance);
 
-        return response()->json(null, 204);
+        return response(null, 204);
     }
 
     public function batch(Request $request){
@@ -172,7 +172,7 @@ class AttendanceController extends Controller
                 # code...
             case 'delete':
                 $this->attendanceRepository->destroy(array_values($data));
-                return response()->json(null, 204);
+                return response(null, 204);
             default:
                 return $this->sendCustomResponse(500, 'Error requestData format on batch of Attendance');
         }

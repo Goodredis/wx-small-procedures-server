@@ -139,7 +139,7 @@ class SupplierController extends Controller
             return $this->sendNotFoundResponse("The Supplier with id {$id} doesn't exist");
         }
         $this->supplierRepository->delete($supplier);
-        return response()->json(null, 204);
+        return response(null, 204);
     }
 
     /**
@@ -163,7 +163,7 @@ class SupplierController extends Controller
                 if(!empty($data)){
                     $this->supplierRepository->destroy($data);
                 }
-                return response()->json(null, 204);
+                return response(null, 204);
 
             default:
                 return response()->json(['status' => 404, 'message' => '参数错误'], 404);

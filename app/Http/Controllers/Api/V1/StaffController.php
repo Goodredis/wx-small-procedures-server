@@ -155,7 +155,7 @@ class StaffController extends Controller
 
         $this->staffRepository->delete($staff);
 
-        return response()->json(null, 204);
+        return response(null, 204);
     }
 
     public function batch(Request $request){
@@ -171,7 +171,7 @@ class StaffController extends Controller
                 # code...
             case 'delete':
                 $this->staffRepository->destroy(array_values($data));
-                return response()->json(null, 204);
+                return response(null, 204);
             default:
                 return $this->sendCustomResponse(500, 'Error requestData format on batch of Attendance');
         }

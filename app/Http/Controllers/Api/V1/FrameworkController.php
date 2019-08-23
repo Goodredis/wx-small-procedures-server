@@ -172,7 +172,7 @@ class FrameworkController extends Controller
             return $this->sendNotFoundResponse("The Framework with id {$id} doesn't exist");
         }
         $this->frameworkRepository->delete($framework);
-        return response()->json(null, 204);
+        return response(null, 204);
     }
 
     /**
@@ -196,7 +196,7 @@ class FrameworkController extends Controller
                 if(!empty($data)){
                     $this->frameworkRepository->destroy($data);
                 }
-                return response()->json(null, 204);
+                return response(null, 204);
 
             default:
                 return response()->json(['status' => 404, 'message' => '参数错误'], 404);
