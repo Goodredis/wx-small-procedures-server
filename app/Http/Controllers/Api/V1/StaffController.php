@@ -191,6 +191,15 @@ class StaffController extends Controller
         return $this->respondWithCollection($attendances, $this->attendanceviewTransformer);
     }
 
+    /**
+     * @brief  人员数据字典
+     * @return array
+     */
+    public function dictionary(Request $request) {
+        $staffs = $this->staffRepository->dictionary($request->get('keyword'));
+        return response()->json($staffs, 200);
+    }
+
     public function import(Request $request){
         $file = $request->file('file');
         $res = $this->staffRepository->importStaffInfos($file);

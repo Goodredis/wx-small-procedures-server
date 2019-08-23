@@ -13,4 +13,6 @@ interface StaffRepository extends BaseRepository
 
 	public function getStaffItemById($id);
 
+	public function dictionary($keyword);
+
 }

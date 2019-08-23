@@ -37,10 +37,8 @@ class EloquentAttendanceRepository extends AbstractEloquentRepository implements
             unset($searchCriteria['start_time']); unset($searchCriteria['end_time']);
         }
         $searchCriteria['del_flag'] = 0;
-        $params['orderby'] = isset($searchCriteria['orderby']) ? $searchCriteria['orderby'] : 'workdate DESC, check_at ASC';
-        $params['page'] = isset($searchCriteria['page']) ? $searchCriteria['page'] : 1;
-        $params['per_page'] = isset($searchCriteria['per_page']) ? $searchCriteria['per_page'] : 15;
-        return parent::findBy($params, $operatorCriteria);
+        $searchCriteria['orderby'] = isset($searchCriteria['orderby']) ? $searchCriteria['orderby'] : 'workdate DESC, check_at ASC';
+        return parent::findBy($searchCriteria, $operatorCriteria);
     }
 
     /**
