@@ -88,4 +88,19 @@ class ContractorderController extends Controller
         return response()->json(null, 204);
     }
 
+    /**
+     * 导入合同订单
+     * @param Request $request
+     * 如果文件名带append则是增量导入
+     */
+    public function import(Request $request){
+        $file = $request->file('file');
+        $res = $this->contractorderRepository->importContractOrderInfo($file);
+        if(isset($res['err_code'])){
+            $res['message'] = trans('errorCode.' . $res['err_code']);
+            return response()->json($res, 415);
+        }
+        return response()->json(['result'=>'ok']);
+    }
+
 }
