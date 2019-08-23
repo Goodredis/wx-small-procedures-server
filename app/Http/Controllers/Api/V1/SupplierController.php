@@ -164,11 +164,9 @@ class SupplierController extends Controller
                     $this->supplierRepository->destroy($data);
                 }
                 return response()->json(null, 204);
-                break;
 
             default:
                 return response()->json(['status' => 404, 'message' => '参数错误'], 404);
-                break;
         }
     }
 
@@ -185,6 +183,19 @@ class SupplierController extends Controller
             return response()->json($res, 415);
         }
         return response()->json(['result'=>'ok']);
+    }
+
+    /**
+     * @brief 获取厂商的字典，只包含简单的信息id，name，code
+     * @param string name 模糊查询厂商名
+     * @return \Illuminate\Http\JsonResponse|string
+     */
+    public function getSupplierDictionary(Request $request){
+        $params = $request->all();
+        $name = isset($params['name']) & !empty($params['name']) ? $params['name'] : '';
+        $suppliers = $this->supplierRepository->getSupplierDictionary($name);
+
+        return $this->respondWithArray($suppliers);
     }
 
     /**

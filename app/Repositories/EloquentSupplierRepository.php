@@ -126,4 +126,25 @@ class EloquentSupplierRepository extends AbstractEloquentRepository implements S
         $supplier = parent::findBy(array('name' => $names))->toArray();
         return !strpos($names, ",") ? array_pop($supplier['data']) : $supplier['data'];
     }
+
+    /**
+     * @brief 获取厂商的字典，只包含简单的信息id，name，code
+     * @param string name 模糊查询厂商名
+     * @return array
+     */
+    public function getSupplierDictionary($name = ''){
+        $query_builder = $this -> model
+            -> select('id', 'name', 'code', 'status')
+            -> where('del_flag', 0)
+            -> orderBy('id', 'desc');
+
+        if(!empty($name)){
+            $query_builder = $query_builder -> where ('name', 'like', '%' . $name . '%');
+        }
+
+        $suppliers = $query_builder -> get() -> toArray();
+
+        return empty($suppliers) ? array() : $suppliers;
+    }
+
 }

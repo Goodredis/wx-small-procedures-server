@@ -40,10 +40,10 @@ class EloquentFrameworkRepository extends AbstractEloquentRepository implements 
      */
     public function save(array $data, $generateUidFlag = true){
         if(isset($data['start_date'])){
-            $data['start_date'] = date("Ymd",strtotime($data['start_date']));
+            $data['start_date'] = date("Ymd",$data['start_date']);
         }
         if(isset($data['end_date'])){
-            $data['end_date'] = date("Ymd",strtotime($data['end_date']));
+            $data['end_date'] = date("Ymd",$data['end_date']);
         }
         //先创建合同框架
         $framework = parent::save($data, $generateUidFlag);

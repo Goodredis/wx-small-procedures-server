@@ -56,6 +56,8 @@ $api->version('v1', [
     //合同框架详情的增删改查
     $api->resources([ 'framworkContractDetails' => 'FrameworkdetailsController' ]);
 
+    //厂商的字典列表
+    $api->get('suppliers/dictionary', 'SupplierController@getSupplierDictionary');
     //厂商的批量操作
     $api->post('suppliers/batch', 'SupplierController@batch');
     //厂商的导入

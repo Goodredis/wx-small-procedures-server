@@ -82,7 +82,7 @@ class Excel
                         if(!$date){
                             $content = null;
                         }else{
-                            $content = gmdate('Ymd', ($date - 25569) * 24 * 3600); //gmdate返回UTC的时间
+                            $content = strtotime(gmdate('Y-m-d', ($date - 25569) * 24 * 3600)); //gmdate返回UTC的时间
                         }
                         break;
                     default :
