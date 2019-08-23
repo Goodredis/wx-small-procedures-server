@@ -121,7 +121,15 @@ abstract class AbstractEloquentRepository implements BaseRepository
             } elseif (count($allValues) > 1) {
                 $queryBuilder->whereIn($key, $allValues);
             } elseif (count($betValues) > 1 && $operatorCriteria[$key] == 'between') {
-                $queryBuilder->whereBetween($key, $betValues);
+                $first = current($betValues);
+                $second = end($betValues);
+                if (empty($first)) {
+                    $queryBuilder->where($key, '<=', $second);
+                } elseif (empty($second)) {
+                    $queryBuilder->where($key, '>=', $first);
+                } else {
+                    $queryBuilder->whereBetween($key, $betValues);
+                }
             } else {
                 $operator = array_key_exists($key, $operatorCriteria) ? $operatorCriteria[$key] : '=';
                 $queryBuilder->where($key, $operator, $value);

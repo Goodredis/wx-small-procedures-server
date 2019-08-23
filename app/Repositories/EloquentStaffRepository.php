@@ -133,6 +133,16 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
         }
     }
 
+    public function dictionary($keyword) {
+        $staffs = Staff::select('uid', 'name')
+                        ->where('name', 'like', '%'.$keyword.'%')
+                        ->where('status', '=', 1)
+                        ->where('del_flag', '=', 0)
+                        ->orderBy('created_at', 'DESC')
+                        ->get();
+        return empty($staffs) ? array() : $staffs;
+    }
+
     public function importStaffInfos($file) {
         $file_path = File::upload($file);
 

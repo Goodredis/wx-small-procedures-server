@@ -20,10 +20,8 @@ class EloquentAttendanceviewRepository extends AbstractEloquentRepository implem
             $operatorCriteria['workdate'] = 'between';
             unset($searchCriteria['start_time']); unset($searchCriteria['end_time']);
         }
-        $params['orderby'] = isset($searchCriteria['orderby']) ? $searchCriteria['orderby'] : 'checkin_at ASC,checkout_at DESC';
-        $params['page'] = isset($searchCriteria['page']) ? $searchCriteria['page'] : 1;
-        $params['per_page'] = isset($searchCriteria['per_page']) ? $searchCriteria['per_page'] : 15;
-        return parent::findBy($params, $operatorCriteria);
+        $searchCriteria['orderby'] = isset($searchCriteria['orderby']) ? $searchCriteria['orderby'] : 'checkin_at ASC, checkout_at DESC';
+        return parent::findBy($searchCriteria, $operatorCriteria);
     }
 
 }
