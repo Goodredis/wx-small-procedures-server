@@ -41,6 +41,8 @@ $app->configure('database');
 // load api configurations
 $app->configure('api');
 
+$app->configure('auth');
+
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
@@ -99,15 +101,17 @@ $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(App\Providers\EventServiceProvider::class);
 $app->register(App\Providers\RepositoriesServiceProvider::class);
-// $app->register(Laravel\Passport\PassportServiceProvider::class);
-// $app->register(Dusterio\LumenPassport\PassportServiceProvider::class);
+//$app->register(Laravel\Passport\PassportServiceProvider::class);
+//$app->register(Dusterio\LumenPassport\PassportServiceProvider::class);
 $app->register(Barryvdh\Cors\ServiceProvider::class);
 $app->register(\Illuminate\Mail\MailServiceProvider::class);
 
 //$app->register(Dingo\Api\Provider\LaravelServiceProvider::class);
 $app->register(Dingo\Api\Provider\LumenServiceProvider::class);
 // LumenPassport::routes($app);
-$app->register(App\Providers\DingoServiceProvider::class);
+//$app->register(App\Providers\DingoServiceProvider::class);
+
+$app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
