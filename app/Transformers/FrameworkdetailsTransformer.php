@@ -15,13 +15,13 @@ class FrameworkdetailsTransformer extends TransformerAbstract
         $formattedFrameworkdetails = [
             'id'             => $frameworkdetails->id,
             'framework_id'   => $frameworkdetails->framework_id,
-            'tax_ratio'      => $frameworkdetails->tax_ratio,
-            'price'          => $frameworkdetails->price,
-            'price_with_tax' => $frameworkdetails->price_with_tax,
+            'tax_ratio'      => round($frameworkdetails->tax_ratio, 2),
+            'price'          => round($frameworkdetails->price, 2),
+            'price_with_tax' => round($frameworkdetails->price_with_tax, 2),
             'type'           => $frameworkdetails->type,
             'level'          => $frameworkdetails->level,
-            'created_at'     => (string)$frameworkdetails->created_at,
-            'updated_at'     => (string)$frameworkdetails->updated_at
+            'created_at'     => $frameworkdetails->created_at,
+            'updated_at'     => $frameworkdetails->updated_at
         ];
 
         return $formattedFrameworkdetails;

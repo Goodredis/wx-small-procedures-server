@@ -7,6 +7,7 @@ use App\Tools\Excel;
 use App\Models\Contractorder;
 use App\Models\Framework;
 use App\Models\Dept;
+use App\Models\Supplier;
 use Illuminate\Database\Eloquent\Model;
 use App\Repositories\Contracts\ContractorderRepository;
 
@@ -25,7 +26,8 @@ class EloquentContractorderRepository extends AbstractEloquentRepository impleme
         '税率'     => 'tax_ratio',
         '税后价款' => 'price',
         '含税价款' => 'price_with_tax',
-        '框架'     => 'framework_id',
+        '厂商'     => 'supplier_code',
+        '框架编号' => 'framework_id',
         '订单状态' => 'status'
     );
     //框架状态、类型对应字典
@@ -98,6 +100,8 @@ class EloquentContractorderRepository extends AbstractEloquentRepository impleme
         $framework_ids = [];
         $eloquentDeptRepository = new EloquentDeptRepository(new Dept());
         $dept_ids = [];
+        $eloquentSupplierRepository = new EloquentSupplierRepository(new Supplier());
+        $supplier_codes = [];
         //记录添加失败的数据
         $error_data = array();
         //循环插入数据表
@@ -117,7 +121,9 @@ class EloquentContractorderRepository extends AbstractEloquentRepository impleme
 
             //获取框架的id
             if(!isset($framework_ids[$value['framework_id']])){
-                $info = $eloquentFrameworkeRepository -> getFrameworkInfoByNames($value['framework_id']);
+
+                $info = $eloquentFrameworkeRepository -> getFrameworkInfoByCodes($value['framework_id']);
+
                 if(empty($info)){
                     $error_data['no_framework_id'][] = $value;
                     continue;
@@ -125,6 +131,18 @@ class EloquentContractorderRepository extends AbstractEloquentRepository impleme
                 $framework_ids[$value['framework_id']] = $info['id'];
             }
             $value['framework_id'] = $framework_ids[$value['framework_id']];
+
+            //获取厂商的code
+            if(!isset($supplier_codes[$value['supplier_code']])){
+                $info = $eloquentSupplierRepository -> getSupplierInfoByNames($value['supplier_code']);
+                if(empty($info)){
+                    $error_data['no_supplier_code'][] = $value;
+                    continue;
+                }
+                $supplier_codes[$value['supplier_code']] = $info['code'];
+            }
+            $value['supplier_code'] = $supplier_codes[$value['supplier_code']];
+
             $res = $this -> save($value);
             if(!$res instanceof Contractorder){
                 $error_data['create_failed'][] = $value;

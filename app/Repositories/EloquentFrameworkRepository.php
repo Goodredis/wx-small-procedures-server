@@ -6,6 +6,7 @@ use App\Tools\File;
 use App\Tools\Excel;
 use App\Repositories\Contracts\FrameworkRepository;
 use App\Models\Framework;
+use App\Models\Supplier;
 use Illuminate\Database\Eloquent\Model;
 
 class EloquentFrameworkRepository extends AbstractEloquentRepository implements FrameworkRepository
@@ -141,11 +142,28 @@ class EloquentFrameworkRepository extends AbstractEloquentRepository implements 
         if (strpos($file_name, 'append') === false){
             $this -> model ->truncate();
         }
+
+        $eloquentSupplierRepository = new EloquentSupplierRepository(new Supplier());
+        $supplier_codes = [];
+
+        //记录添加失败的数据
         $error_data = array();
         //循环插入数据表
         foreach ($data as $key => $value) {
             $value['type'] = isset($this -> string_map['type'][$value['type']]) ? $this -> string_map['type'][$value['type']] : $value['type'];
             $value['status'] = isset($this -> string_map['status'][$value['status']]) ? $this -> string_map['status'][$value['status']] : $value['status'];
+
+            //获取厂商的code
+            if(!isset($supplier_codes[$value['supplier_code']])){
+                $info = $eloquentSupplierRepository -> getSupplierInfoByNames($value['supplier_code']);
+                if(empty($info)){
+                    $error_data['no_supplier_code'][] = $value;
+                    continue;
+                }
+                $supplier_codes[$value['supplier_code']] = $info['code'];
+            }
+            $value['supplier_code'] = $supplier_codes[$value['supplier_code']];
+
             $res = $this -> save($value);
             if(!$res instanceof Framework){
                 $error_data['create_failed'][] = $value;
@@ -161,11 +179,55 @@ class EloquentFrameworkRepository extends AbstractEloquentRepository implements 
 
     /**
      * @brief  通过框架名称获取框架基本信息
-     * @param  string names 多个用逗号隔开
+     * @param  string|array names 框架名称
      * @return array
      */
     public function getFrameworkInfoByNames($names) {
-        $framework = parent::findBy(array('name' => $names))->toArray();
-        return !strpos($names, ",") ? array_pop($framework['data']) : $framework['data'];
+        if(!is_array($names)){
+            $names = array($names);
+        }
+        $framework = $this -> model
+            -> select('id','name','code')
+            -> whereIn('name', $names)
+            -> get()
+            -> toArray();
+        return  empty($framework) ? array() : ((count($names) == 1) ? $framework[0] : $framework);
+    }
+
+    /**
+     * @brief  通过框架编号获取框架基本信息
+     * @param  string|array names 框架编号
+     * @return array
+     */
+    public function getFrameworkInfoByCodes($codes) {
+        if(!is_array($codes)){
+            $codes = array($codes);
+        }
+        $framework = $this -> model
+            -> select('id','name','code')
+            -> whereIn('code', $codes)
+            -> get()
+            -> toArray();
+        return  empty($framework) ? array() : ((count($codes) == 1) ? $framework[0] : $framework);
+    }
+
+    /**
+     * @brief 获取框架的字典，只包含简单的信息id，name，code
+     * @param string name 模糊查询厂商名
+     * @return array
+     */
+    public function getFrameworkDictionary($name = ''){
+        $query_builder = $this -> model
+            -> select('id', 'name', 'code', 'type','status')
+            -> where('del_flag', 0)
+            -> orderBy('created_at', 'desc');
+
+        if(!empty($name)){
+            $query_builder = $query_builder -> where ('name', 'like', '%' . $name . '%');
+        }
+
+        $suppliers = $query_builder -> get() -> toArray();
+
+        return empty($suppliers) ? array() : $suppliers;
     }
 }

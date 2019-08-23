@@ -119,12 +119,19 @@ class EloquentSupplierRepository extends AbstractEloquentRepository implements S
 
     /**
      * @brief  通过厂商名称获取厂商基本信息
-     * @param  string names 多个用逗号隔开
+     * @param  string|array names 厂商名称
      * @return array
      */
     public function getSupplierInfoByNames($names) {
-        $supplier = parent::findBy(array('name' => $names))->toArray();
-        return !strpos($names, ",") ? array_pop($supplier['data']) : $supplier['data'];
+        if(!is_array($names)){
+            $names = array($names);
+        }
+        $supplier = $this -> model
+            -> select('name','code')
+            -> whereIn('name', $names)
+            -> get()
+            -> toArray();
+        return  empty($supplier) ? array() : ((count($names) == 1) ? $supplier[0] : $supplier);
     }
 
     /**

@@ -90,24 +90,25 @@ class EloquentFrameworkdetailsRepository extends AbstractEloquentRepository impl
             $this -> model ->truncate();
         }
         //记录所有已查出的框架id，以编号做为key
-        $framework_ids = array();
-        $framework_model = new Framework();
+        $eloquentFrameworkeRepository = new EloquentFrameworkRepository(new Framework());
+        $framework_ids = [];
         $error_data = array();
         //循环插入数据表
         foreach ($data as $key => $value) {
-            //根据合同框架编号查找合同框架id
+            //获取框架的id
             if(!isset($framework_ids[$value['framework_id']])){
-                $info = $framework_model -> where('code', $value['framework_id']) -> first();
+                $info = $eloquentFrameworkeRepository -> getFrameworkInfoByCodes($value['framework_id']);
                 if(empty($info)){
                     $error_data['no_framework_id'][] = $value;
                     continue;
                 }
-                $info = $info -> toArray();
                 $framework_ids[$value['framework_id']] = $info['id'];
             }
             $value['framework_id'] = $framework_ids[$value['framework_id']];
+
             $value['type'] = isset($this -> string_map['type'][$value['type']]) ? $this -> string_map['type'][$value['type']] : $value['type'];
             $value['level'] = isset($this -> string_map['level'][$value['level']]) ? $this -> string_map['level'][$value['level']] : $value['level'];
+
             $res = $this -> save($value);
             if(!$res instanceof Frameworkdetails){
                 $error_data['create_failed'][] = $value;

@@ -46,6 +46,7 @@ class Contractorder extends Model
         'tax_ratio',
         'price',
         'price_with_tax',
+        'supplier_code',
         'framework_id',
         'status',
         'del_flag'

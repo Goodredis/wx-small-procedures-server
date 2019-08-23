@@ -219,6 +219,18 @@ class FrameworkController extends Controller
     }
 
     /**
+     * @brief 获取框架的字典，只包含简单的信息id，name，code，type，status
+     * @param string name 模糊查询框架名
+     * @return \Illuminate\Http\JsonResponse|string
+     */
+    public function getFrameworkDictionary(Request $request){
+        $params = $request->all();
+        $name = isset($params['name']) & !empty($params['name']) ? $params['name'] : '';
+        $frameworks = $this->frameworkRepository->getFrameworkDictionary($name);
+        return $this->respondWithArray($frameworks);
+    }
+
+    /**
      * Store Request Validation Rules
      *
      * @param Request $request

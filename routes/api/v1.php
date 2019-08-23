@@ -46,6 +46,8 @@ $api->version('v1', [
     // 合同订单的增删改查
     $api->resources([ 'contractOrders' => 'ContractorderController' ]);
 
+    //合同框架的字典列表
+    $api->get('framworkContracts/dictionary', 'FrameworkController@getFrameworkDictionary');
     //合同框架的批量操作
     $api->post('framworkContracts/batch', 'FrameworkController@batch');
     //合同框架的导入
@@ -66,4 +68,11 @@ $api->version('v1', [
     $api->post('suppliers/content', 'SupplierController@import');
     //厂商的增删改查
     $api->resources([ 'suppliers' => 'SupplierController' ]);
+
+    //部所的字典列表
+    $api->get('depts/dictionary', 'DeptController@getDeptDictionary');
+    //部所的导入
+    $api->post('depts/content', 'DeptController@import');
+    //部所的增查
+    $api->resources([ 'depts' => 'DeptController' ]);
 });
