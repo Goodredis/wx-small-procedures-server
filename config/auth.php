@@ -8,13 +8,21 @@ return [
 
     'guards' => [
         'api' => [
-            'driver' => 'passport',
+            'driver' => 'jwt',
             'provider' => 'users',
+        ],
+        'staff_api' => [
+            'driver' => 'jwt',
+            'provider' => 'staff',
         ],
     ],
 
     'providers' => [
         'users' => [
+            'driver' => 'eloquent',
+            'model' => \App\Models\User::class
+        ],
+        'staff' => [
             'driver' => 'eloquent',
             'model' => \App\Models\User::class
         ]

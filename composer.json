@@ -15,7 +15,8 @@
         "illuminate/mail": "5.5.*",
         "dingo/api": "^2.3",
         "phpoffice/phpspreadsheet": "^1.8",
-        "symfony/var-dumper": "3.4.30"
+        "symfony/var-dumper": "3.4.30",
+        "tymon/jwt-auth": "1.0.0-rc.3"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.7",

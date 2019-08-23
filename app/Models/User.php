@@ -1,21 +1,14 @@
 <?php
 
 namespace App\Models;
-
 use Illuminate\Auth\Authenticatable;
-use Laravel\Lumen\Auth\Authorizable;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Laravel\Passport\HasApiTokens;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 
-class User extends Model implements AuthenticatableContract, AuthorizableContract
+class User extends Model implements AuthenticatableContract, JWTSubject
 {
-    use Authenticatable, Authorizable, SoftDeletes, HasApiTokens;
-
-    const ADMIN_ROLE = 'ADMIN_USER';
-    const BASIC_ROLE = 'BASIC_USER';
+    use SoftDeletes, Authenticatable;
 
     /**
      * The database table used by the model.
@@ -31,22 +24,17 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      */
     protected $fillable = [
         'uid',
-        'firstName',
-        'lastName',
-        'middleName',
-        'email',
+        'name',
         'password',
-        'address',
-        'zipCode',
-        'username',
-        'city',
-        'state',
-        'country',
-        'phone',
+        'gender',
         'mobile',
-        'role',
-        'isActive',
-        'profileImage'
+        'email',
+        'avatar',
+        'employee_number',
+        'order',
+        'ldap_id',
+        'org_id',
+        'status'
     ];
 
     /**
@@ -58,11 +46,15 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'password',
     ];
 
-    /**
-     * @return bool
-     */
-    public function isAdmin()
+    // jwt 需要实现的方法
+    public function getJWTIdentifier()
     {
-        return (isset($this->role) ? $this->role : self::BASIC_ROLE) == self::ADMIN_ROLE;
+        return $this->getKey();
+    }
+
+    // jwt 需要实现的方法, 一些自定义的参数
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
 }

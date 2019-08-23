@@ -85,7 +85,7 @@ class ContractorderController extends Controller
 
         $this->contractorderRepository->delete($order);
 
-        return response()->json(null, 204);
+        return response(null, 204);
     }
 
     /**

@@ -22,12 +22,12 @@ class File
         $fileextension = $file -> getClientOriginalExtension();
         $allow_type = explode(",", env('UPLOAD_FILE_TYPE'));
         if(!in_array($fileextension, $allow_type)){
-            throw new Exception(trans('errorCode.11001'), 11001);
+            throw new Exception(trans('errorCode.110001'), 110001);
         }
         //获取上传文件的大小
         $filesize=$file->getClientSize();
         if($filesize > env('UPLOAD_MAX_SIZE')*1024*1024){
-            throw new Exception(trans('errorCode.11002'), 11002);
+            throw new Exception(trans('errorCode.110002'), 110002);
         }
         //获取文件名称,并整理新名称，新名称规则为[filename+时间.扩展名]
         $filename = $file->getClientOriginalName();
