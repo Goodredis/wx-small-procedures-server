@@ -21,6 +21,7 @@ class Org extends Model
      */
     protected $fillable = [
         'id',
+        'code',
         'name',
         'order',
         'status',

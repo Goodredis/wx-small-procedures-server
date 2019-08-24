@@ -55,7 +55,7 @@ class User extends Model implements AuthenticatableContract, JWTSubject
      * 获取组织部所
      */
     public function org(){
-        return $this->belongsTo('App\Models\Org', 'org_id');
+        return $this->belongsTo('App\Models\Org', 'org_code', 'code');
     }
 
     /**
