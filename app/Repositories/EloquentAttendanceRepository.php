@@ -11,11 +11,11 @@ use App\Repositories\Contracts\AttendanceRepository;
 class EloquentAttendanceRepository extends AbstractEloquentRepository implements AttendanceRepository
 {
 
-	/*
+    /*
      * @inheritdoc
      */
-    public function save(array $data, $generateUidFlag = true) {
-        return parent::save($data, $generateUidFlag);
+    public function save(array $data) {
+        return parent::save($data);
     }
 
     /**
@@ -27,10 +27,10 @@ class EloquentAttendanceRepository extends AbstractEloquentRepository implements
     }
     
 
-	/**
+    /**
      * @inheritdoc
      */
-    public function findBy(array $searchCriteria = [], $operatorCriteria = []) {
+    public function findBy(array $searchCriteria = [], array $operatorCriteria = []) {
         if (isset($searchCriteria['start_time']) && isset($searchCriteria['end_time'])) {
             $searchCriteria['workdate'] = date('Ymd', $searchCriteria['start_time']) . "~" . date('Ymd', $searchCriteria['end_time']);
             $operatorCriteria['workdate'] = 'between';

@@ -39,7 +39,8 @@ class EloquentFrameworkRepository extends AbstractEloquentRepository implements 
     /*
      * 增加合同框架，可同时添加合同框架的详情
      */
-    public function save(array $data, $generateUidFlag = true){
+    public function save(array $data)
+    {
         if(isset($data['start_date'])){
             $data['start_date'] = date("Ymd",$data['start_date']);
         }
@@ -47,7 +48,7 @@ class EloquentFrameworkRepository extends AbstractEloquentRepository implements 
             $data['end_date'] = date("Ymd",$data['end_date']);
         }
         //先创建合同框架
-        $framework = parent::save($data, $generateUidFlag);
+        $framework = parent::save($data);
         //如果有合同框架详情就创建合同框架详情
         if(isset($data['frameworkdetails'])){
             $frameworkdetails = $data['frameworkdetails'];
@@ -88,7 +89,7 @@ class EloquentFrameworkRepository extends AbstractEloquentRepository implements 
      * 按条件查询信息列表
      * 默认有搜索del_flag位为0的条件，即没有删除的
      */
-    public function findBy(array $searchCriteria = [], $operatorCriteria = []){
+    public function findBy(array $searchCriteria = [], array $operatorCriteria = []){
         $searchCriteria['orderby'] = (isset($searchCriteria['orderby']) && !empty($searchCriteria['orderby'])) ? $searchCriteria['orderby'] : 'created_at desc';
         $searchCriteria['del_flag'] = 0;
         return parent::findBy($searchCriteria, $operatorCriteria);

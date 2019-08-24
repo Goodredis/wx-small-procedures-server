@@ -31,7 +31,7 @@ interface BaseRepository
      * @param string $orderCriteria
      * @return Collection
      */
-    public function findBy(array $searchCriteria = [], $operatorCriteria = []);
+    public function findBy(array $searchCriteria = [], array $operatorCriteria = []);
 
     /**
      * Search All resources by any values of a key
@@ -48,7 +48,7 @@ interface BaseRepository
      * @param array $data
      * @return Model
      */
-    public function save(array $data, $generateUidFlag = true);
+    public function save(array $data);
 
     /**
      * Update a resource

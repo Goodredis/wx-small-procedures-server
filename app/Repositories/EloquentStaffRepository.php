@@ -39,10 +39,10 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
 	/*
      * @inheritdoc
      */
-    public function save(array $data, $generateUidFlag = true) {
+    public function save(array $data) {
         $data['uid'] = Uuid::uuid4();
         $data['birthday'] = date('Ymd', $data['birthday']);
-        return parent::save($data, $generateUidFlag);
+        return parent::save($data);
     }
 
     /**
@@ -85,7 +85,7 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
 	/**
      * @inheritdoc
      */
-    public function findBy(array $searchCriteria = [], $operatorCriteria = []) {
+    public function findBy(array $searchCriteria = [], array $operatorCriteria = []) {
         if (isset($searchCriteria['name'])) {
             $searchCriteria['name'] = '%' . $searchCriteria['name'] . '%';
             $operatorCriteria['name'] = 'like';

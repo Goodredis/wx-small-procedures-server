@@ -10,23 +10,17 @@ class UserTransformer extends TransformerAbstract
     public function transform(User $user)
     {
         $formattedUser = [
-            'id'                    => $user->uid,
-            'firstName'             => $user->firstName,
-            'lastName'              => $user->lastName,
-            'middleName'            => $user->middleName,
-            'username'              => $user->username,
-            'email'                 => $user->email,
-            'address'               => $user->address,
-            'zipCode'               => $user->zipCode,
-            'city'                  => $user->city,
-            'state'                 => $user->state,
-            'country'               => $user->country,
-            'phone'                 => $user->phone,
+            'id'                    => $user->id,
+            'name'                  => $user->name,
+            'gender'                => $user->gender,
             'mobile'                => $user->mobile,
-            'role'                  => $user->role,
-            'profileImage'          => $user->profileImage,
-            'createdAt'             => (string) $user->created_at,
-            'updatedAt'             => (string) $user->updated_at
+            'email'                 => $user->email,
+            'avatar'                => $user->avatar,
+            'employee_number'       => $user->employee_number,
+            'title'                 => $user->title,
+            'order'                 => $user->order,
+            'org'                   => $user->org,
+            'status'                => $user->status,
         ];
 
         return $formattedUser;

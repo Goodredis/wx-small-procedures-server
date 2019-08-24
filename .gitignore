@@ -4,5 +4,4 @@ Homestead.yaml
 /.vagrant/
 /vendor/
 /.idea/
-/storage/*.key
-composer.lock
+/storage/

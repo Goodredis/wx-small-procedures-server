@@ -20,7 +20,7 @@ class EloquentSupplierRepository extends AbstractEloquentRepository implements S
     /*
      * @inheritdoc
      */
-    public function save(array $data, $generateUidFlag = false)
+    public function save(array $data)
     {
         $supplier = parent::save($data);
         return $supplier;
@@ -43,7 +43,7 @@ class EloquentSupplierRepository extends AbstractEloquentRepository implements S
     /**
      * @inheritdoc
      */
-    public function findBy(array $searchCriteria = [], $operatorCriteria = [])
+    public function findBy(array $searchCriteria = [], array $operatorCriteria = [])
     {
         $searchCriteria['orderby'] = (isset($searchCriteria['orderby']) && !empty($searchCriteria['orderby'])) ? $searchCriteria['orderby'] : 'created_at desc';
         $searchCriteria['del_flag'] = 0;

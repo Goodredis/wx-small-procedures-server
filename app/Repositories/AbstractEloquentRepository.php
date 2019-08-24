@@ -68,7 +68,7 @@ abstract class AbstractEloquentRepository implements BaseRepository
     /**
      * @inheritdoc
      */
-    public function findBy(array $searchCriteria = [], $operatorCriteria = [])
+    public function findBy(array $searchCriteria = [], array $operatorCriteria = [])
     {
         $limit = !empty($searchCriteria['per_page']) ? (int)$searchCriteria['per_page'] : 15; // it's needed for pagination
         $page = !empty($searchCriteria['page']) ? (int)$searchCriteria['page'] : 1; //默认为第一页
@@ -78,6 +78,7 @@ abstract class AbstractEloquentRepository implements BaseRepository
             $columns = explode(',', $searchCriteria['columns']);
             unset($searchCriteria['columns']);;
         }
+
         $orderby = '';
         if(!empty($searchCriteria['orderby'])) {
             $orderby = trim($searchCriteria['orderby']);
@@ -139,15 +140,21 @@ abstract class AbstractEloquentRepository implements BaseRepository
         return $queryBuilder;
     }
 
-    protected function applyOrderCriteriaInQueryBuilder($queryBuilder, $orderby) {
-        if (!empty($orderby)) {
-            $sections = explode(',', trim($orderby));
-            foreach ($sections as $section) {
-                $section = trim($section);
-                if ($section) {
-                    $tmp = explode(' ', $section);
-                    $queryBuilder = $queryBuilder->orderBy(trim($tmp[0]), isset($tmp[1]) ? $tmp[1] : 'ASC');
-                }
+    /**
+     * @inheritdoc
+     */
+    protected function applyOrderCriteriaInQueryBuilder($queryBuilder, $orderby) 
+    {
+        if (empty($orderby)) {
+            return $queryBuilder;
+        }
+
+        $sections = explode(',', trim($orderby));
+        foreach ($sections as $section) {
+            $section = trim($section);
+            if ($section) {
+                $tmp = explode(' ', $section);
+                $queryBuilder = $queryBuilder->orderBy(trim($tmp[0]), isset($tmp[1]) ? $tmp[1] : 'ASC');
             }
         }
         return $queryBuilder;
@@ -156,11 +163,10 @@ abstract class AbstractEloquentRepository implements BaseRepository
     /**
      * @inheritdoc
      */
-    public function save(array $data, $generateUidFlag = true)
+    public function save(array $data)
     {
         // generate uid
-        if($generateUidFlag === true) $data['id'] = Uuid::uuid4();
-
+        if(!$this->model->incrementing) $data['id'] = Uuid::uuid4();
         return $this->model->create($data);
     }
 

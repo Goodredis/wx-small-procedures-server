@@ -38,9 +38,9 @@ class EloquentFrameworkdetailsRepository extends AbstractEloquentRepository impl
      * @inheritdoc
      * 新建合同框架的一条详情信息
      */
-    public function save(array $data, $generateUidFlag = false)
+    public function save(array $data)
     {
-        return parent::save($data,$generateUidFlag);
+        return parent::save($data);
     }
 
     /**
@@ -56,7 +56,7 @@ class EloquentFrameworkdetailsRepository extends AbstractEloquentRepository impl
     /**
      * @inheritdoc
      */
-    public function findBy(array $searchCriteria = [], $operatorCriteria = [])
+    public function findBy(array $searchCriteria = [], array $operatorCriteria = [])
     {
         $searchCriteria['orderby'] = (isset($searchCriteria['orderby']) && !empty($searchCriteria['orderby'])) ? $searchCriteria['orderby'] : 'framework_id,created_at desc';
         return parent::findBy($searchCriteria, $operatorCriteria);
