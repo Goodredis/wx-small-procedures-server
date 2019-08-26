@@ -18,15 +18,15 @@ class ContractorderTransformer extends TransformerAbstract
             'dept_id'               => $contractorder->dept_id,
             'signer'                => $contractorder->signer,
             'project_id'            => $contractorder->project_id,
-            'parent_project_id'     => $contractorder->parent_project_id,
             'start_date'            => strtotime($contractorder->start_date),
             'end_date'              => strtotime($contractorder->end_date),
             'tax_ratio'             => $contractorder->tax_ratio,
             'price'                 => $contractorder->price,
             'price_with_tax'        => $contractorder->price_with_tax,
+            'used_price'            => $contractorder->used_price,
             'status'                => intval($contractorder->status),
-            'created_at'            => strtotime($contractorder->created_at),
-            'updated_at'            => strtotime($contractorder->updated_at),
+            'created_at'            => $contractorder->created_at,
+            'updated_at'            => $contractorder->updated_at,
             'del_flag'              => intval($contractorder->del_flag),
         ];
 
@@ -34,6 +34,8 @@ class ContractorderTransformer extends TransformerAbstract
     }
 
     public function includeFramework(Contractorder $contractorder) {
-        return $this->item($contractorder->frameworkInfo, new FrameworkTransformer());
+        $frameworkTransformer = new FrameworkTransformer();
+        // $frameworkTransformer = $frameworkTransformer->setDefaultIncludes(['supplier', 'details']);
+        return $this->item($contractorder->frameworkInfo, $frameworkTransformer);
     }
 }

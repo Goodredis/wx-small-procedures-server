@@ -159,20 +159,18 @@ class ContractorderController extends Controller
      */
     private function storeRequestValidationRules(Request $request) {
         $rules = [
-            'name'                  => 'max:255',
-            'code'                  => 'max:64',
-            'dept_id'               => 'max:64',
-            'signer'                => 'max:64',
-            'project_id'            => 'max:64',
-            'parent_project_id'     => 'max:64',
-            'start_date'            => 'max:11',
-            'end_date'              => 'max:11',
-            'tax_ratio'             => 'max:11',
-            'price'                 => 'max:64',
-            'price_with_tax'        => 'max:64',
-            'supplier_code'         => 'max:64',
-            'framework_id'          => 'max:64',
-            'status'                => 'max:1',
+            'name'                  => 'string|required|max:255',
+            'code'                  => 'string|required|max:64',
+            'dept_id'               => 'string|required|max:64',
+            'signer'                => 'string|required|max:64',
+            'project_id'            => 'string|required|max:644',
+            'start_date'            => 'string|required|max:11',
+            'end_date'              => 'string|required|max:11',
+            'tax_ratio'             => 'integer|required|max:100',
+            'price'                 => 'string|required|max:64',
+            'price_with_tax'        => 'string|required|max:64',
+            'used_price'            => 'max:64',
+            'framework_id'          => 'string|required|max:64',
         ];
         return $rules;
     }
@@ -185,20 +183,19 @@ class ContractorderController extends Controller
      */
     private function updateRequestValidationRules(Request $request) {
         $rules = [
-            'name'                  => 'max:255',
-            'code'                  => 'max:64',
-            'dept_id'               => 'max:64',
-            'signer'                => 'max:64',
-            'project_id'            => 'max:64',
-            'parent_project_id'     => 'max:64',
-            'start_date'            => 'max:11',
-            'end_date'              => 'max:11',
-            'tax_ratio'             => 'max:11',
-            'price'                 => 'max:64',
-            'price_with_tax'        => 'max:64',
-            'supplier_code'         => 'max:64',
-            'framework_id'          => 'max:64',
-            'status'                => 'max:1',
+            'id'                    => 'string|required|max:64',
+            'name'                  => 'string|required|max:255',
+            'code'                  => 'string|required|max:64',
+            'dept_id'               => 'string|required|max:64',
+            'signer'                => 'string|required|max:64',
+            'project_id'            => 'string|required|max:644',
+            'start_date'            => 'string|required|max:11',
+            'end_date'              => 'string|required|max:11',
+            'tax_ratio'             => 'integer|required|max:100',
+            'price'                 => 'string|required|max:64',
+            'price_with_tax'        => 'string|required|max:64',
+            'used_price'            => 'max:64',
+            'framework_id'          => 'string|required|max:64',
         ];
         return $rules;
     }

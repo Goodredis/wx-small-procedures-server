@@ -15,6 +15,14 @@ class Contractorder extends Model
     protected $table = 'contract_order';
 
     /**
+     * 设置时间格式
+     */
+    protected $casts = [
+        'created_at' => 'timestamps',
+        'updated_at' => 'timestamps'
+    ];
+
+    /**
      * 定义自动更新为时间戳格式
      *
      * @var string
@@ -40,12 +48,12 @@ class Contractorder extends Model
         'dept_id',
         'signer',
         'project_id',
-        'parent_project_id',
         'start_date',
         'end_date',
         'tax_ratio',
         'price',
         'price_with_tax',
+        'used_price',
         'supplier_code',
         'framework_id',
         'status',

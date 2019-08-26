@@ -26,6 +26,7 @@ class EloquentContractorderRepository extends AbstractEloquentRepository impleme
         '税率'     => 'tax_ratio',
         '税后价款' => 'price',
         '含税价款' => 'price_with_tax',
+        '已用额度' => 'used_price',
         '厂商'     => 'supplier_code',
         '框架编号' => 'framework_id',
         '订单状态' => 'status'
@@ -43,8 +44,13 @@ class EloquentContractorderRepository extends AbstractEloquentRepository impleme
      * @inheritdoc
      */
     public function save(array $data) {
+        // 转换截止时间为时间戳格式
         $data['start_date'] = isset($data['start_date']) ? date('Ymd', $data['start_date']) : '';
         $data['end_date'] = isset($data['end_date']) ? date('Ymd', $data['end_date']) : '';
+        // 获取供应商code
+        $eloquentFrameworkRepository = new EloquentFrameworkRepository(new Framework());
+        $framework_info = $eloquentFrameworkRepository->findOne($data['framework_id'])->toArray();
+        $data['supplier_code'] = $framework_info['supplier_code'];
         return parent::save($data);
     }
 
@@ -53,12 +59,20 @@ class EloquentContractorderRepository extends AbstractEloquentRepository impleme
      */
     public function update(Model $model, array $data)
     {
+        // 如果存在 则转换 否之则不动
         if (isset($data['start_date'])) {
             $data['start_date'] = date('Ymd', $data['start_date']);
         }
         if (isset($data['end_date'])) {
             $data['end_date'] = date('Ymd', $data['end_date']);
         }  
+        // 如果框架合同变更 则同时变更供应商code
+        $order_info = $model->toArray();
+        if ($data['framework_id'] != $order_info['framework_id']) {
+            $eloquentFrameworkRepository = new EloquentFrameworkRepository(new Framework());
+            $framework_info = $eloquentFrameworkRepository->findOne($data['framework_id'])->toArray();
+            $data['supplier_code'] = $framework_info['supplier_code'];
+        }
         return parent::update($model, $data);
     }
 
