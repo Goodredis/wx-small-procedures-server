@@ -73,6 +73,13 @@ class EloquentFrameworkRepository extends AbstractEloquentRepository implements 
             $frameworkdetails->delete();
         }
 
+        if(isset($data['start_date'])){
+            $data['start_date'] = date("Ymd",$data['start_date']);
+        }
+        if(isset($data['end_date'])){
+            $data['end_date'] = date("Ymd",$data['end_date']);
+        }
+
         //更新合同框架的基本信息
         $updatedFramework = parent::update($model, $data);
 
