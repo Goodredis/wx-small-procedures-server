@@ -21,8 +21,8 @@ class AttendanceTransformer extends TransformerAbstract
             'check_at'              => intval($attendance->check_at),
             'source'                => intval($attendance->source),
             'source_flag'           => intval($attendance->source_flag),
-            'created_at'            => strtotime($attendance->created_at),
-            'updated_at'            => strtotime($attendance->updated_at),
+            'created_at'            => $attendance->created_at,
+            'updated_at'            => $attendance->updated_at,
             'del_flag'              => intval($attendance->del_flag)
         ];
         return $formattedAttendance;

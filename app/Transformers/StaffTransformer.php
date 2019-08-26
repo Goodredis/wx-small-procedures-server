@@ -37,7 +37,9 @@ class StaffTransformer extends TransformerAbstract
     }
 
     public function includeCompany(Staff $staff) {
-        return $this->item($staff->companydetails, new SupplierTransformer());
+        $supplierTransformer = new SupplierTransformer();
+        $supplierTransformer = $supplierTransformer->setDefaultIncludes([]);
+        return $this->item($staff->companydetails, $supplierTransformer);
     }
 
 }

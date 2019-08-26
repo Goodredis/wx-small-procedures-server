@@ -17,8 +17,8 @@ class AttendanceviewTransformer extends TransformerAbstract
             'checkout_remark'       => $attendanceview->checkout_remark,
             'checkin_position'      => $attendanceview->checkin_position,
             'checkout_position'     => $attendanceview->checkout_position,
-            'checkin_at'            => intval($attendanceview->checkin_at),
-            'checkout_at'           => intval($attendanceview->checkout_at),
+            'checkin_at'            => $attendanceview->checkin_at,
+            'checkout_at'           => $attendanceview->checkout_at,
             'checkin_source'        => intval($attendanceview->checkin_source),
             'checkout_source'       => intval($attendanceview->checkout_source),
             'checkin_source_flag'   => intval($attendanceview->checkin_source_flag),
@@ -28,6 +28,8 @@ class AttendanceviewTransformer extends TransformerAbstract
     }
 
     public function includeStaff(Attendanceview $attendanceview) {
-        return $this->item($attendanceview->staff, new StaffTransformer());
+        $staffTransformer = new StaffTransformer();
+        $staffTransformer = $staffTransformer->setDefaultIncludes(['company']);
+        return $this->item($attendanceview->staff, $staffTransformer);
     }
 }

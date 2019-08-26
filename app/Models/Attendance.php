@@ -15,6 +15,14 @@ class Attendance extends Model
     protected $table = 'attendance';
 
     /**
+     * 设置时间格式
+     */
+    protected $casts = [
+        'created_at' => 'timestamps',
+        'updated_at' => 'timestamps'
+    ];
+
+    /**
      * Storage format of date field
      *
      * @var string

@@ -67,8 +67,8 @@ class Contractorder extends Model
      */
     public function frameworkInfo() {
         return $this->belongsTo(Framework::class, 'framework_id', 'id')
-                    ->where('status', 1)
-                    ->where('del_flag', 0);
+                    ->where('status', '=', 1)
+                    ->where('del_flag', '!=', 1);
     }
     
 }

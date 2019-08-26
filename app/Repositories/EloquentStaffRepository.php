@@ -42,6 +42,7 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
     public function save(array $data) {
         $data['uid'] = Uuid::uuid4();
         $data['birthday'] = date('Ymd', $data['birthday']);
+        $data['employee_number'] = 'w' . $data['mobile'];
         return parent::save($data);
     }
 
@@ -59,7 +60,7 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
      * @return array
      */
     public function getStaffInfoByNames($names) {
-        $staffs = parent::findBy(array('name' => $names, 'del_flag' => 0))->toArray();
+        $staffs = parent::findBy(array('name' => $names, 'del_flag' => 1), array('del_flag' => '!='))->toArray();
         return !strpos($names, ",") ? array_pop($staffs['data']) : $staffs['data'];
     }
 
@@ -78,7 +79,7 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
                 $ids = array_pop($ids);
             }
         }
-        $staffs = parent::findBy(array('uid' => $ids, 'del_flag' => 0))->toArray();
+        $staffs = parent::findBy(array('name' => $names, 'del_flag' => 1), array('del_flag' => '!='))->toArray();
         return ($flag == true) ? array_pop($staffs['data']) : $staffs['data'];
     }
 
@@ -104,7 +105,8 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
             $searchCriteria['label'] = $label;
             $operatorCriteria['label'] = 'raw';
         }
-        $searchCriteria['del_flag'] = 0;
+        $searchCriteria['del_flag'] = 1;
+        $operatorCriteria['del_flag'] = '!=';
         $searchCriteria['orderby'] = isset($searchCriteria['orderby']) ? $searchCriteria['orderby'] : 'created_at DESC';
         return parent::findBy($searchCriteria, $operatorCriteria);
     }
@@ -138,7 +140,7 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
         $staffs = Staff::select('uid', 'name')
                         ->where('name', 'like', '%'.$keyword.'%')
                         ->where('status', '=', 1)
-                        ->where('del_flag', '=', 0)
+                        ->where('del_flag', '!=', 1)
                         ->orderBy('created_at', 'DESC')
                         ->get();
         return empty($staffs) ? array() : $staffs;

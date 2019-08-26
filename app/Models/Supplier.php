@@ -63,7 +63,7 @@ class Supplier extends Model
     public function framework()
     {
         return $this->hasMany('App\Models\Framework', 'supplier_code', 'code')
-        -> where('del_flag',0)
+        -> where('del_flag', '!=', 1)
         -> orderBy('created_at', 'desc');
     }
 }

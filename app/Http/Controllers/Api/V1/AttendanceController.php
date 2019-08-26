@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use Exception;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
@@ -108,7 +107,7 @@ class AttendanceController extends Controller
             return $this->sendInvalidFieldResponse($validatorResponse);
         }
 
-        $attendance = $this->attendanceRepository->save($request->all(), false);
+        $attendance = $this->attendanceRepository->save($request->all());
 
         if (!$attendance instanceof Attendance) {
             return $this->sendCustomResponse(500, 'Error occurred on creating Attendance');
@@ -162,8 +161,8 @@ class AttendanceController extends Controller
     public function batch(Request $request){
         $method = $request->post('method');
         $data = $request->post('data');
-        if (empty($method) || empty($data) || !is_array($data)) {
-            throw new Exception(trans('errorCode.120001'), 120001); 
+        if (empty($data) || !is_array($data)) {
+            return $this->sendCustomResponse(400, 'Error bad parameter format on batch of Attendance');
         }
         switch ($method) { 
             case 'create':
@@ -174,7 +173,7 @@ class AttendanceController extends Controller
                 $this->attendanceRepository->destroy(array_values($data));
                 return response(null, 204);
             default:
-                return $this->sendCustomResponse(500, 'Error requestData format on batch of Attendance');
+                return $this->sendCustomResponse(500, 'Error This method is not supported on batch of Attendance');
         }
         exit;
     }
@@ -188,13 +187,12 @@ class AttendanceController extends Controller
     private function storeRequestValidationRules(Request $request) {
         $rules = [
             'uid'                   => 'string|required|max:36',
-            'remark'                => 'max:255',
-            'position'              => 'max:255',
-            'purpose'               => 'max:1',
-            'workdate'              => 'max:8',
-            'check_at'              => 'max:11',
-            'source'                => 'max:1',
-            'source_flag'           => 'max:1',
+            'remark'                => 'string|max:255',
+            'position'              => 'string|max:255',
+            'purpose'               => 'integer|required|in:1,2',
+            'check_at'              => 'max:10',
+            'source'                => 'integer|required|in:1,2,3',
+            'source_flag'           => 'integer|required|in:1,2',
         ];
         return $rules;
     }
@@ -207,14 +205,13 @@ class AttendanceController extends Controller
      */
     private function updateRequestValidationRules(Request $request) {
         $rules = [
-            'uid'                   => 'max:36',
-            'remark'                => 'max:255',
-            'position'              => 'max:255',
-            'purpose'               => 'max:1',
-            'workdate'              => 'max:8',
-            'check_at'              => 'max:11',
-            'source'                => 'max:1',
-            'source_flag'           => 'max:1',
+            'uid'                   => 'string|required|max:36',
+            'remark'                => 'string|required|max:255',
+            'position'              => 'string|max:255',
+            'purpose'               => 'integer|required|in:1,2',
+            'check_at'              => 'max:10',
+            'source'                => 'integer|required|in:1,2,3',
+            'source_flag'           => 'integer|required|in:1,2',
         ];
         return $rules;
     }

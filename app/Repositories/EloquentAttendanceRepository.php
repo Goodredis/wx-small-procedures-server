@@ -2,7 +2,9 @@
 
 namespace App\Repositories;
 
+use Exception;
 use App\Utils\Excel;
+use App\Models\Staff;
 use App\Models\Attendance;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +17,18 @@ class EloquentAttendanceRepository extends AbstractEloquentRepository implements
      * @inheritdoc
      */
     public function save(array $data) {
+        // 判断该用户是否存在
+        $eloquentStaffRepository = new EloquentStaffRepository(new Staff());
+        $userInfo = $eloquentStaffRepository->getStaffInfoByUids($data['uid']);
+        if (empty($userInfo)) {
+            throw new Exception(trans('errorCode.120001'), 120001);
+        }
+        // 补卡必须填写补卡说明
+        if ($data['source_flag']==2 && empty($data['remark'])) {
+            throw new Exception(trans('errorCode.120002'), 120002);
+        }
+        // 设置打卡日期
+        $data['workdate'] = date('Ymd', $data['check_at']);
         return parent::save($data);
     }
 
@@ -23,6 +37,14 @@ class EloquentAttendanceRepository extends AbstractEloquentRepository implements
      */
     public function update(Model $model, array $data)
     {
+        // 判断该用户是否存在
+        $eloquentStaffRepository = new EloquentStaffRepository(new Staff());
+        $userInfo = $eloquentStaffRepository->getStaffInfoByUids($data['uid']);
+        if (empty($userInfo)) {
+            throw new Exception(trans('errorCode.120001'), 120001);
+        }
+        // 设置打卡日期
+        $data['workdate'] = date('Ymd', $data['check_at']);
         return parent::update($model, $data);
     }
     
@@ -31,12 +53,19 @@ class EloquentAttendanceRepository extends AbstractEloquentRepository implements
      * @inheritdoc
      */
     public function findBy(array $searchCriteria = [], array $operatorCriteria = []) {
+        // 检索公司
+        // 检索起止日期
         if (isset($searchCriteria['start_time']) && isset($searchCriteria['end_time'])) {
             $searchCriteria['workdate'] = date('Ymd', $searchCriteria['start_time']) . "~" . date('Ymd', $searchCriteria['end_time']);
             $operatorCriteria['workdate'] = 'between';
             unset($searchCriteria['start_time']); unset($searchCriteria['end_time']);
         }
-        $searchCriteria['del_flag'] = 0;
+        // 检索状态
+        // 检索项目名称
+        // 检索项目编号
+        // 检索人员 Automation
+        $searchCriteria['del_flag'] = 1;
+        $operatorCriteria['del_flag'] = '!=';
         $searchCriteria['orderby'] = isset($searchCriteria['orderby']) ? $searchCriteria['orderby'] : 'workdate DESC, check_at ASC';
         return parent::findBy($searchCriteria, $operatorCriteria);
     }

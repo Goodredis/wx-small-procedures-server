@@ -98,7 +98,8 @@ class EloquentFrameworkRepository extends AbstractEloquentRepository implements 
      */
     public function findBy(array $searchCriteria = [], array $operatorCriteria = []){
         $searchCriteria['orderby'] = (isset($searchCriteria['orderby']) && !empty($searchCriteria['orderby'])) ? $searchCriteria['orderby'] : 'created_at desc';
-        $searchCriteria['del_flag'] = 0;
+        $searchCriteria['del_flag'] = 1;
+        $operatorCriteria['del_flag'] = '!=';
         return parent::findBy($searchCriteria, $operatorCriteria);
     }
 
@@ -227,7 +228,7 @@ class EloquentFrameworkRepository extends AbstractEloquentRepository implements 
     public function getFrameworkDictionary($name = ''){
         $query_builder = $this -> model
             -> select('id', 'name', 'code', 'type','status')
-            -> where('del_flag', 0)
+            -> where('del_flag', '!=', 1)
             -> orderBy('created_at', 'desc');
 
         if(!empty($name)){

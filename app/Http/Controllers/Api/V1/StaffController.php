@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use Exception;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Staff;
@@ -107,7 +106,7 @@ class StaffController extends Controller
             return $this->sendInvalidFieldResponse($validatorResponse);
         }
 
-        $staff = $this->staffRepository->save($request->all(), false);
+        $staff = $this->staffRepository->save($request->all());
 
         if (!$staff instanceof Staff) {
             return $this->sendCustomResponse(500, 'Error occurred on creating staff');
@@ -161,8 +160,8 @@ class StaffController extends Controller
     public function batch(Request $request){
         $method = $request->post('method');
         $data = $request->post('data');
-        if (empty($method) || empty($data) || !is_array($data)) {
-            throw new Exception(trans('errorCode.130001'), 130001); 
+        if (empty($data) || !is_array($data)) {
+            return $this->sendCustomResponse(400, 'Error bad parameter format on batch of Attendance');
         }
         switch ($method) { 
             case 'create':
@@ -173,7 +172,7 @@ class StaffController extends Controller
                 $this->staffRepository->destroy(array_values($data));
                 return response(null, 204);
             default:
-                return $this->sendCustomResponse(500, 'Error requestData format on batch of Attendance');
+                return $this->sendCustomResponse(500, 'Error This method is not supported on batch of Attendance');
         }
         exit;
     }
@@ -245,6 +244,7 @@ class StaffController extends Controller
      */
     private function updateRequestValidationRules(Request $request) {
         $rules = [
+            'uid'                   => '',
             'name'                  => 'max:255',
             'gender'                => 'max:1',
             'level'                 => 'max:1',

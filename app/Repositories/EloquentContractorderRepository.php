@@ -2,8 +2,8 @@
 
 namespace App\Repositories;
 
-use App\Tools\File;
-use App\Tools\Excel;
+use App\Utils\File;
+use App\Utils\Excel;
 use App\Models\Contractorder;
 use App\Models\Framework;
 use App\Models\Dept;
@@ -30,6 +30,7 @@ class EloquentContractorderRepository extends AbstractEloquentRepository impleme
         '框架编号' => 'framework_id',
         '订单状态' => 'status'
     );
+
     //框架状态、类型对应字典
     private $string_map = array(
         'status' => [
@@ -37,8 +38,40 @@ class EloquentContractorderRepository extends AbstractEloquentRepository impleme
             '已完成' => 2
         ]
     );
+
+    /*
+     * @inheritdoc
+     */
+    public function save(array $data, $generateUidFlag = true) {
+        $data['start_date'] = isset($data['start_date']) ? date('Ymd', $data['start_date']) : '';
+        $data['end_date'] = isset($data['end_date']) ? date('Ymd', $data['end_date']) : '';
+        return parent::save($data, $generateUidFlag);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function update(Model $model, array $data)
+    {
+        if (isset($data['start_date'])) {
+            $data['start_date'] = date('Ymd', $data['start_date']);
+        }
+        if (isset($data['end_date'])) {
+            $data['end_date'] = date('Ymd', $data['end_date']);
+        }  
+        return parent::update($model, $data);
+    }
+
 	/**
-     * 获取合同订单List
+     * @brief  获取合同订单list
+     * @param    dept_id          部门
+     * @param    name             订单名称
+     * @param    code             订单编号
+     * @param    supplier_code    供应商
+     * @param    project_id       项目名称
+     * @param    project_id       项目编号
+     * @param    status           订单状态
+     * @return   collection
      */
     public function getContractOrderInfos(array $searchCriteria = []) {
         $operatorCriteria = array();
@@ -57,12 +90,15 @@ class EloquentContractorderRepository extends AbstractEloquentRepository impleme
         // 检索项目名称
         // 检索项目编号
         // 检索订单状态 Automation 
-        $searchCriteria['del_flag'] = 0;
+        $searchCriteria['del_flag'] = 1;
+        $operatorCriteria['del_flag'] = '!=';
         return parent::findBy($searchCriteria, $operatorCriteria);
     }
 
     /**
-     * 获取单条合同订单
+     * @brief  获取单条合同订单
+     * @param    id               订单id
+     * @return   collection
      */
     public function getContractOrderInfoById($id) {
         $criteria = array('id' => $id, 'del_flag' => 0);
@@ -70,7 +106,7 @@ class EloquentContractorderRepository extends AbstractEloquentRepository impleme
     }
 
     /**
-     * @inheritdoc
+     * @brief  删除单条合同订单--逻辑删除
      */
     public function delete(Model $model){
         return parent::update($model, ['del_flag' => 1]);
