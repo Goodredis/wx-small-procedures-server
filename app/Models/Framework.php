@@ -75,7 +75,7 @@ class Framework extends Model
      * 获取供应商
      */
     public function supplier(){
-        return $this->belongsTo('App\Models\Supplier', 'supplier_code', 'code')->orderBy('id','desc');
+        return $this->belongsTo('App\Models\Supplier', 'supplier_code', 'code');
     }
 
     /**

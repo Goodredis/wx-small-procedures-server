@@ -195,6 +195,7 @@ class FrameworkdetailsController extends Controller
     {
         $userId = $request->segment(2);
         $rules = [
+            'framework_id' => 'required|max:64',
             'type'         => 'integer|in:1,2',
             'level'        => 'integer|in:1,2,3'
         ];

@@ -191,15 +191,16 @@ class FrameworkController extends Controller
         $params = $request->all();
         $method = $params['method'];
         $data = $params['data'];
+        if(empty($data)){
+            return response()->json(['status' => 400, 'message' => '参数错误'], 400);
+        }
         switch ($method) {
             case 'delete'://批量删除
-                if(!empty($data)){
-                    $this->frameworkRepository->destroy($data);
-                }
+                $this->frameworkRepository->destroy($data);
                 return response(null, 204);
 
             default:
-                return response()->json(['status' => 404, 'message' => '参数错误'], 404);
+                return response()->json(['status' => 400, 'message' => '参数错误'], 400);
         }
     }
 
@@ -259,6 +260,7 @@ class FrameworkController extends Controller
         $rules = [
             'name'                  => 'max:255',
             'code'                  => 'max:64',
+            'tax_ratio'             => 'required',
             'type'                  => 'integer|in:1,2',
             'supplier_code'         => 'max:64',
             'frameworkdetails'      => 'array'

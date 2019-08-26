@@ -158,15 +158,16 @@ class SupplierController extends Controller
         $params = $request->all();
         $method = $params['method'];
         $data = $params['data'];
+        if(empty($data)){
+            return response()->json(['status' => 400, 'message' => '参数错误'], 400);
+        }
         switch ($method) {
             case 'delete'://批量删除
-                if(!empty($data)){
-                    $this->supplierRepository->destroy($data);
-                }
+                $this->supplierRepository->destroy($data);
                 return response(null, 204);
 
             default:
-                return response()->json(['status' => 404, 'message' => '参数错误'], 404);
+                return response()->json(['status' => 400, 'message' => '参数错误'], 400);
         }
     }
 
@@ -222,8 +223,8 @@ class SupplierController extends Controller
      */
     private function updateRequestValidationRules(Request $request){
         $rules = [
-            'name'                  => 'max:255',
-            'code'                  => 'max:64',
+            'name'                  => 'required|max:255',
+            'code'                  => 'required|max:64',
             'status'                => 'integer|in:1,2'
         ];
         return $rules;
