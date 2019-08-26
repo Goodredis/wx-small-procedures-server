@@ -2,8 +2,8 @@
 
 namespace App\Repositories;
 
-use App\Tools\File;
-use App\Tools\Excel;
+use App\Utils\File;
+use App\Utils\Excel;
 use App\Repositories\Contracts\FrameworkdetailsRepository;
 use App\Models\Frameworkdetails;
 use App\Models\Framework;

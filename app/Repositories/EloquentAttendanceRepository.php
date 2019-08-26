@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Tools\Excel;
+use App\Utils\Excel;
 use App\Models\Attendance;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Model;

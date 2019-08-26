@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Tools;
+namespace App\Utils;
 
 /**
- * Tool class 公共类库
+ * Util class 公共类库
  * @author wanggang
  * @version 1.0
  * @time 2019-08-21
  */
-class Tool
+class Util
 {
 
 	public static function test() {

@@ -2,8 +2,8 @@
 
 namespace App\Repositories;
 
-use App\Tools\File;
-use App\Tools\Excel;
+use App\Utils\File;
+use App\Utils\Excel;
 use App\Repositories\Contracts\SupplierRepository;
 use App\Models\Supplier;
 use Illuminate\Database\Eloquent\Model;
