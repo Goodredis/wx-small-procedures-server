@@ -11,7 +11,7 @@ class EloquentDeptRepository extends AbstractEloquentRepository implements DeptR
     /**
      * 按条件查询信息列表
      */
-    public function findBy(array $searchCriteria = [], $operatorCriteria = []){
+    public function findBy(array $searchCriteria = [], array $operatorCriteria = []){
         $searchCriteria['orderby'] = (isset($searchCriteria['orderby']) && !empty($searchCriteria['orderby'])) ? $searchCriteria['orderby'] : 'department_id';
         return parent::findBy($searchCriteria, $operatorCriteria);
     }

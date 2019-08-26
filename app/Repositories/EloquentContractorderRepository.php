@@ -42,10 +42,10 @@ class EloquentContractorderRepository extends AbstractEloquentRepository impleme
     /*
      * @inheritdoc
      */
-    public function save(array $data, $generateUidFlag = true) {
+    public function save(array $data) {
         $data['start_date'] = isset($data['start_date']) ? date('Ymd', $data['start_date']) : '';
         $data['end_date'] = isset($data['end_date']) ? date('Ymd', $data['end_date']) : '';
-        return parent::save($data, $generateUidFlag);
+        return parent::save($data);
     }
 
     /**

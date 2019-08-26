@@ -11,9 +11,9 @@ class EloquentTestRepository extends AbstractEloquentRepository implements TestR
     /*
      * @inheritdoc
      */
-    public function save(array $data, $generateUidFlag = true)
+    public function save(array $data)
     {
-        $test = parent::save($data, $generateUidFlag);
+        $test = parent::save($data);
         return $test;
     }
 
@@ -29,7 +29,7 @@ class EloquentTestRepository extends AbstractEloquentRepository implements TestR
     /**
      * @inheritdoc
      */
-    public function findBy(array $searchCriteria = [], $operatorCriteria = [])
+    public function findBy(array $searchCriteria = [], array $operatorCriteria = [])
     {
         return parent::findBy($searchCriteria, $operatorCriteria);
     }
