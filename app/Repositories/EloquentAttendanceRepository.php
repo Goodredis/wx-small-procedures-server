@@ -100,8 +100,8 @@ class EloquentAttendanceRepository extends AbstractEloquentRepository implements
         foreach ($export_data['data'] as $key => $value) {
             $lists[$key]['date'] = $value['workdate'];
             $lists[$key]['uid'] = $value['uid'];
-            $lists[$key]['checkin_at'] = date('Y-m-d H:i:s', $value['checkin_at']);
-            $lists[$key]['checkout_at'] = date('Y-m-d H:i:s', $value['checkout_at']);
+            $lists[$key]['checkin_at'] = date('Y-m-d H:i:s', intval($value['checkin_at']));
+            $lists[$key]['checkout_at'] = date('Y-m-d H:i:s', intval($value['checkout_at']));
             $lists[$key]['status'] = '正常';
         }
         $format_column = array('日期', '姓名', '上班时间', '下班时间', '状态');

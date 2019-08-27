@@ -66,12 +66,18 @@ class StaffController extends Controller
      */
 	public function index(Request $request) {
         $requestData = $request->all();
+        $output = 'json';
+        if (isset($requestData['output']) && !empty($requestData['output'])) {
+            $output = $requestData['output'];
+            unset($requestData['output']);
+        }
         $staffs = $this->staffRepository->findBy($requestData);
-        $output = isset($requestData['output']) ? $requestData['output'] : 'json';
         if ($output == 'json') {
             return $this->respondWithCollection($staffs, $this->staffTransformer);
         } elseif ($output == 'excel') {
             # code...
+        } else {
+            return $this->sendCustomResponse(400, 'Error bad parameter format on batch of Attendance');
         }
 	}
 

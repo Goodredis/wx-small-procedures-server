@@ -67,12 +67,18 @@ class AttendanceController extends Controller
      */
 	public function index(Request $request) {
         $requestData = $request->all();
+        $output = 'json';
+        if (isset($requestData['output']) && !empty($requestData['output'])) {
+            $output = $requestData['output'];
+            unset($requestData['output']);
+        }
         $attendances = $this->attendanceviewRepository->getAttendanceviewList($requestData);
-        $output = isset($requestData['output']) ? $requestData['output'] : 'json';
         if ($output == 'json') {
             return $this->respondWithCollection($attendances, $this->attendanceviewTransformer);
         } elseif ($output == 'excel') {
             $this->attendanceRepository->exportAttendances($attendances->toArray());
+        } else {
+            return $this->sendCustomResponse(400, 'Error bad parameter format on batch of Attendance');
         }
 	}
 
