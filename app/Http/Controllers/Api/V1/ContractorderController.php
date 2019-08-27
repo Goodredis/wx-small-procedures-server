@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use Exception;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Contractorder;
+use App\Models\Contractorderquota;
 use App\Repositories\Contracts\ContractorderRepository;
+use App\Repositories\Contracts\ContractorderquotaRepository;
 use App\Transformers\ContractorderTransformer;
+use App\Transformers\ContractorderquotaTransformer;
 
 class ContractorderController extends Controller
 {
@@ -25,14 +29,32 @@ class ContractorderController extends Controller
     private $contractorderTransformer;
 
     /**
+     * Instance of ContractorderquotaRepository
+     *
+     * @var ContractorderquotaRepository
+     */
+    private $contractorderquotaRepository;
+
+    /**
+     * Instanceof ContractorderquotaTransformer
+     *
+     * @var ContractorderquotaTransformer
+     */
+    private $contractorderquotaTransformer;
+
+    /**
      * Constructor
      *
      * @param ContractorderRepository $contractorderRepository
      * @param ContractorderTransformer $contractorderTransformer
+     * @param ContractorderquotaRepository $contractorderquotaRepository
+     * @param ContractorderquotaTransformer $contractorderquotaTransformer
      */
-    public function __construct(ContractorderRepository $contractorderRepository, ContractorderTransformer $contractorderTransformer) {
+    public function __construct(ContractorderRepository $contractorderRepository, ContractorderTransformer $contractorderTransformer, ContractorderquotaRepository $contractorderquotaRepository, ContractorderquotaTransformer $contractorderquotaTransformer) {
         $this->contractorderRepository = $contractorderRepository;
         $this->contractorderTransformer = $contractorderTransformer;
+        $this->contractorderquotaRepository = $contractorderquotaRepository;
+        $this->contractorderquotaTransformer = $contractorderquotaTransformer;
         
         parent::__construct();
     }
@@ -143,6 +165,47 @@ class ContractorderController extends Controller
     }
 
     /**
+     * 合同订单分配到项目
+     * @param Request $request
+     * @param string  $id
+     * @return collection
+     */
+    public function projects(Request $request, $id) {
+        $requestData = array(
+            array(
+                'contract_order_id'  =>  'dda62df8-5cff-4574-be1f-e146a902f081',
+                'signer'             =>  'signer1',
+                'project_id'         =>  'sub1',
+                'parent_project_id'  =>  '16632ea1-1758-4533-be27-19765fecefaa',
+                'tax_ratio'          =>  '6',
+                'price'              =>  '500000',
+                'price_with_tax'     =>  '530000',
+            ),
+            array(
+                'contract_order_id'  =>  'dda62df8-5cff-4574-be1f-e146a902f081',
+                'signer'             =>  'signer2',
+                'project_id'         =>  'sub2',
+                'parent_project_id'  =>  '16632ea1-1758-4533-be27-19765fecefaa',
+                'tax_ratio'          =>  '6',
+                'price'              =>  '200000',
+                'price_with_tax'     =>  '212000',
+            ),
+            array(
+                'contract_order_id'  =>  'dda62df8-5cff-4574-be1f-e146a902f081',
+                'signer'             =>  'signer3',
+                'project_id'         =>  'sub3',
+                'parent_project_id'  =>  '16632ea1-1758-4533-be27-19765fecefaa',
+                'tax_ratio'          =>  '6',
+                'price'              =>  '200000',
+                'price_with_tax'     =>  '212000',
+            ),
+        );
+        // $requestData = $request->all();
+        $ret = $this->contractorderquotaRepository->assignOrderToProjects($id, $requestData);
+        return isset($ret['err_code']) ? $this->sendCustomResponse(400, $ret['message']) : $this->respondWithArray($ret['data']);
+    }
+
+    /**
      * 导入合同订单
      * @param Request $request
      * 如果文件名带append则是增量导入
@@ -189,7 +252,6 @@ class ContractorderController extends Controller
      */
     private function updateRequestValidationRules(Request $request) {
         $rules = [
-            'id'                    => 'string|required|max:64',
             'name'                  => 'string|required|max:255',
             'code'                  => 'string|required|max:64',
             'dept_id'               => 'string|required|max:64',
