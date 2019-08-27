@@ -30,12 +30,19 @@ class Staff extends Model
     protected $dateFormat = 'U';
 
     /**
+     * 定义主键非自增
+     *
+     * @var boolean
+     */
+    public $incrementing = false;
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'uid',
+        'id',
         'name',
         'gender',
         'level',

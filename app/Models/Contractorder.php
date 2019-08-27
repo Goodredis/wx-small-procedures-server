@@ -71,12 +71,26 @@ class Contractorder extends Model
     ];
 
     /**
-     * 定义反向关联关系
+     * 关联框架合同
      */
     public function frameworkInfo() {
-        return $this->belongsTo(Framework::class, 'framework_id', 'id')
-                    ->where('status', '=', 1)
-                    ->where('del_flag', '!=', 1);
+        return $this->belongsTo(Framework::class, 'framework_id', 'id');
+    }
+
+    /**
+     * 关联供应商
+     */
+    public function supplierInfo() {
+        return $this->belongsTo(Supplier::class, 'supplier_code', 'code');
+    }
+
+    /**
+     * 获取合同订单配额
+     */
+    public function orderQuotas() {
+        return $this->hasMany(Contractorderquota::class, 'contract_order_id', 'id')
+                    ->where('parent_project_id', '!=' , '')
+                    ->orderBy('created_at');
     }
     
 }

@@ -13,7 +13,6 @@ class StaffTransformer extends TransformerAbstract
     public function transform(Staff $staff) {
         $formattedStaff = [
             'id'                    => $staff->id,
-            'uid'                   => $staff->uid,
             'name'                  => $staff->name,
             'gender'                => intval($staff->gender),
             'level'                 => intval($staff->level),

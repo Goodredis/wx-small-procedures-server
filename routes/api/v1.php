@@ -36,7 +36,7 @@ $api->version('v1', [
     // 人员管理的数据字典
     $api->get('staffs/dictionary', 'StaffController@dictionary');
     // 人员管理的考勤列表
-    $api->get('staffs/{uid}/attendances', 'StaffController@attendances');
+    $api->get('staffs/{id}/attendances', 'StaffController@attendances');
     // 人员管理的批量操作
     $api->post('staffs/batch', 'StaffController@batch');
     // 人员管理的导入

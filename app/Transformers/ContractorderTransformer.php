@@ -8,7 +8,7 @@ use League\Fractal\TransformerAbstract;
 class ContractorderTransformer extends TransformerAbstract
 {
 
-    protected $defaultIncludes = ['framework'];
+    protected $defaultIncludes = ['framework', 'supplier', 'quota'];
 
     public function transform(Contractorder $contractorder) {
         $formattedContractorder = [
@@ -29,13 +29,39 @@ class ContractorderTransformer extends TransformerAbstract
             'updated_at'            => $contractorder->updated_at,
             'del_flag'              => intval($contractorder->del_flag),
         ];
-
         return $formattedContractorder;
     }
 
+    /**
+     * 获取所属合同框架
+     * @param model quota
+     * @return \League\Fractal\Resource\Item
+     */
     public function includeFramework(Contractorder $contractorder) {
         $frameworkTransformer = new FrameworkTransformer();
-        // $frameworkTransformer = $frameworkTransformer->setDefaultIncludes(['supplier', 'details']);
+        $frameworkTransformer = $frameworkTransformer->setDefaultIncludes(['details']);
         return $this->item($contractorder->frameworkInfo, $frameworkTransformer);
+    }
+
+    /**
+     * 获取供应商
+     * @param model quota
+     * @return \League\Fractal\Resource\Item
+     */
+    public function includeSupplier(Contractorder $contractorder) {
+        $supplierTransformer = new SupplierTransformer();
+        $supplierTransformer = $supplierTransformer->setDefaultIncludes([]);
+        return $this->item($contractorder->supplierInfo, $supplierTransformer);
+    }
+
+    /**
+     * 获取合同订单配额
+     * @param model quota
+     * @return \League\Fractal\Resource\Collection
+     */
+    public function includeQuota(Contractorder $contractorder) {
+        $quotaTransformer = new ContractorderquotaTransformer();
+        $quotaTransformer = $quotaTransformer->setDefaultIncludes([]);
+        return $this->collection($contractorder->orderQuotas, $quotaTransformer);
     }
 }

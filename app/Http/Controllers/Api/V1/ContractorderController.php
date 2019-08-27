@@ -45,12 +45,18 @@ class ContractorderController extends Controller
      */
 	public function index(Request $request) {
         $requestData = $request->all();
+        $output = 'json';
+        if (isset($requestData['output']) && !empty($requestData['output'])) {
+            $output = $requestData['output'];
+            unset($requestData['output']);
+        }
         $orders = $this->contractorderRepository->getContractOrderInfos($requestData);
-        $output = isset($requestData['output']) ? $requestData['output'] : 'json';
         if ($output == 'json') {
             return $this->respondWithCollection($orders, $this->contractorderTransformer);
         } elseif ($output == 'excel') {
-            $this->contractorderRepository->exportContractorders($orders->toArray());
+            # code...
+        } else {
+            return $this->sendCustomResponse(400, 'Error bad parameter format on batch of Attendance');
         }
 	}
 

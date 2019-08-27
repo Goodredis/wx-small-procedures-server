@@ -88,7 +88,7 @@ class StaffController extends Controller
      * @return \Illuminate\Http\JsonResponse|string
      */
     public function show($id) {
-        $staff = $this->staffRepository->getStaffItemById(intval($id));
+        $staff = $this->staffRepository->getStaffItemById($id);
 
         if (!$staff instanceof Staff) {
             return $this->sendNotFoundResponse("The staff with id {$id} doesn't exist");
@@ -188,8 +188,8 @@ class StaffController extends Controller
      * @param  string
      * @return array
      */
-    public function attendances($uid) {
-        $attendances = $this->attendanceviewRepository->getAttendanceviewList(array('uid' => $uid));
+    public function attendances($id) {
+        $attendances = $this->attendanceviewRepository->getAttendanceviewList(array('uid' => $id));
         return $this->respondWithCollection($attendances, $this->attendanceviewTransformer);
     }
 
