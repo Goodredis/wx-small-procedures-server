@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 
 class User extends Model implements AuthenticatableContract, JWTSubject
@@ -32,6 +31,11 @@ class User extends Model implements AuthenticatableContract, JWTSubject
     public $incrementing = false;
 
     /**
+     * 定义常量,标记是研究院员工 
+     */
+    public $actor = 'user';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -47,7 +51,7 @@ class User extends Model implements AuthenticatableContract, JWTSubject
         'employee_number',
         'order',
         'ldap_id',
-        'org_id',
+        'org_code',
         'status'
     ];
 

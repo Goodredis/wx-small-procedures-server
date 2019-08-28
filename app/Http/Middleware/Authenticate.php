@@ -5,7 +5,10 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Factory as Auth;
-use Laravel\Passport\Http\Middleware\CheckClientCredentials;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 
 class Authenticate
 {
@@ -37,18 +40,23 @@ class Authenticate
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        // First, check if the access_token created by the password grant is valid
-        if ($this->auth->guard($guard)->guest()) {
-
-            // Then check, access_token created by the client_credentials grant is valid.
-            // We need this checking because we could use either password grant or client_credentials grant.
-            try {
-                app(CheckClientCredentials::class)->handle($request, function(){});
-            } catch (AuthenticationException $e) {
-                return response()->json((['status' => 401, 'message' => 'Unauthorized']), 401);
-            }
+        if ($this->auth->guard('api')->guest() && $this->auth->guard('staff_api')->guest()) {
+            return response()->json((['status' => 401, 'message' => 'Unauthorized']), 401);
         }
-
+/*
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json([ 'message' => '该用户不存在。', 'status_code' => 404 ], 404);
+            }
+var_dump($user);exit;
+        } catch (TokenExpiredException $e) {
+            return response()->json([ 'message' => 'Token已过期。', 'status_code' => 401 ], 401);
+        } catch (TokenInvalidException $e) {
+            return response()->json([ 'message' => 'Token无效。', 'status_code' => 401 ], 401); 
+        } catch (JWTException $e) {
+            return response()->json([ 'message' => '解析Token异常。', 'status_code' => 401 ], 401);
+        }
+*/
         return $next($request);
     }
 }

@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Auth\Authenticatable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 
-class Staff extends Model
+class Staff extends Model implements AuthenticatableContract, JWTSubject
 {
+    use Authenticatable;
 
     /**
      * The database table used by the model.
@@ -84,6 +88,18 @@ class Staff extends Model
 
     public function companydetails() {
         return $this->belongsTo(Supplier::class, 'company', 'code');
+    }
+
+    // jwt 需要实现的方法
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    // jwt 需要实现的方法, 一些自定义的参数
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
     
 }
