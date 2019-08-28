@@ -82,7 +82,7 @@ class AuthController extends Controller
     private function storeRequestValidationRules(Request $request)
     {
         $rules = [
-            'email'                  => 'required',
+            'email'                  => 'required|email',
             'password'               => 'required',
         ];
 
@@ -95,10 +95,10 @@ class AuthController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse|string
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         $authorization = new Authorization($this->jwt->parseToken()->refresh());
-        return $this->response->item($authorization, $this->authTransformer);
+        return $this->respondWithItem($authorization, $this->authTransformer);
     }
 
     /**

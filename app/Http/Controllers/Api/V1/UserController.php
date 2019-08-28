@@ -78,6 +78,7 @@ class UserController extends Controller
     private function storeRequestValidationRules(Request $request){
         $rules = [
             'name'                  => 'required|max:255',
+            'email'                 => 'required|max:255|email',
         ];
 
         return $rules;
@@ -131,7 +132,8 @@ class UserController extends Controller
     private function updateRequestValidationRules(Request $request)
     {
         $rules = [
-            'name'                 => '',
+            'name'                  => 'required|max:255',
+            'email'                 => 'required|max:255|email',
         ];
         return $rules;
     }

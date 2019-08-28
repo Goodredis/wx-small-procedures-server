@@ -10,6 +10,10 @@ use App\Foundations\Fractal\NoDataArraySerializer;
 class Controller extends BaseController
 {
     use ResponseTrait;
+    /**
+     * the current login user 
+     */
+    protected $user;
 
     /**
      * Constructor
@@ -21,6 +25,8 @@ class Controller extends BaseController
         $fractal = $fractal === null ? new Manager() : $fractal;
         $fractal->setSerializer(new NoDataArraySerializer);//设置序列化器
         $this->setFractal($fractal);
+
+        $this->user = \Auth::user();
     }
 
     /**

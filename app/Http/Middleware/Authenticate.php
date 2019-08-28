@@ -43,12 +43,21 @@ class Authenticate
         if ($this->auth->guard('api')->guest() && $this->auth->guard('staff_api')->guest()) {
             return response()->json((['status' => 401, 'message' => 'Unauthorized']), 401);
         }
+
 /*
+        $guards = array_keys(config('auth.guards'));
+        foreach ($guards as $guard) {
+            if ($user = $this->auth->guard($guard)->user()) {
+                $request->merge([ 'current_user' => $user ]);
+                return $next($request);
+            }
+        }
+        return response()->json((['status' => 401, 'message' => 'Unauthorized']), 401);
+
         try {
             if (!$user = JWTAuth::parseToken()->authenticate()) {
                 return response()->json([ 'message' => '该用户不存在。', 'status_code' => 404 ], 404);
             }
-var_dump($user);exit;
         } catch (TokenExpiredException $e) {
             return response()->json([ 'message' => 'Token已过期。', 'status_code' => 401 ], 401);
         } catch (TokenInvalidException $e) {
