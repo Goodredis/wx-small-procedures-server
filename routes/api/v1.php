@@ -58,7 +58,7 @@ $api->version('v1', [
     // 获取合同订单负责人
     $api->get('contractOrders/{id}/managers', 'ContractorderController@getOrderManagers');
     // 变更合同订单负责人
-    $api->get('contractOrders/{id}/managers', 'ContractorderController@setOrderManagers');
+    $api->put('contractOrders/{id}/managers', 'ContractorderController@setOrderManagers');
     // 获取合同订单项目记录
     $api->get('contractOrders/{id}/projects', 'ContractorderController@getprojectsfromorder');
     // 合同订单分配到项目
@@ -96,6 +96,8 @@ $api->version('v1', [
     //部所的增查
     $api->resources([ 'depts' => 'DeptController' ]);
 
+    //配置字典的批量操作
+    $api->post('options/batch', 'OptionController@batch');
     //配置字典的增查
     $api->resources([ 'options' => 'OptionController' ]);
 });

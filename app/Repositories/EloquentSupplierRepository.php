@@ -48,6 +48,10 @@ class EloquentSupplierRepository extends AbstractEloquentRepository implements S
         $searchCriteria['orderby'] = (isset($searchCriteria['orderby']) && !empty($searchCriteria['orderby'])) ? $searchCriteria['orderby'] : 'created_at desc';
         $searchCriteria['del_flag'] = 1;
         $operatorCriteria['del_flag'] = '!=';
+        if (isset($searchCriteria['name'])) {
+            $searchCriteria['name'] = '%' . $searchCriteria['name'] . '%';
+            $operatorCriteria['name'] = 'like';
+        }
         return parent::findBy($searchCriteria, $operatorCriteria);
     }
 

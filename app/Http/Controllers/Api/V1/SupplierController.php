@@ -207,8 +207,8 @@ class SupplierController extends Controller
      */
     private function storeRequestValidationRules(Request $request){
         $rules = [
-            'name'                  => 'required|max:255',
-            'code'                  => 'required|max:64',
+            'name'                  => 'required|unique:supplier|max:255',
+            'code'                  => 'required|unique:supplier|max:64',
             'status'                => 'integer|in:1,2'
         ];
 

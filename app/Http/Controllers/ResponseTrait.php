@@ -70,7 +70,7 @@ trait ResponseTrait
      */
     public function sendCustomResponse($status, $message)
     {
-        return response()->json(['status' => $status, 'message' => $message], $status);
+        return response()->json(['status_code' => $status, 'message' => $message], $status);
     }
 
     /**
@@ -81,7 +81,7 @@ trait ResponseTrait
      */
     public function sendUnknownFieldResponse($errors)
     {
-        return response()->json((['status' => 400, 'unknown_fields' => $errors]), 400);
+        return response()->json((['status_code' => 400, 'unknown_fields' => $errors]), 400);
     }
 
     /**
@@ -92,7 +92,7 @@ trait ResponseTrait
      */
     public function sendInvalidFilterResponse($errors)
     {
-        return response()->json((['status' => 400, 'invalid_filters' => $errors]), 400);
+        return response()->json((['status_code' => 400, 'invalid_filters' => $errors]), 400);
     }
 
     /**
@@ -103,7 +103,7 @@ trait ResponseTrait
      */
     public function sendInvalidFieldResponse($errors)
     {
-        return response()->json((['status' => 400, 'invalid_fields' => $errors]), 400);
+        return response()->json((['status_code' => 400, 'invalid_fields' => $errors]), 400);
     }
 
     /**
@@ -113,7 +113,7 @@ trait ResponseTrait
      */
     public function sendForbiddenResponse()
     {
-        return response()->json(['status' => 403, 'message' => 'Forbidden'], 403);
+        return response()->json(['status_code' => 403, 'message' => 'Forbidden'], 403);
     }
 
     /**
@@ -128,7 +128,7 @@ trait ResponseTrait
             $message = 'The requested resource was not found';
         }
 
-        return response()->json(['status' => 404, 'message' => $message], 404);
+        return response()->json(['status_code' => 404, 'message' => $message], 404);
     }
 
     /**

@@ -179,7 +179,7 @@ class OptionController extends Controller
      */
     private function storeRequestValidationRules(Request $request){
         $rules = [
-            'key'                  => 'required|string|max:64',
+            'key'                  => 'required|unique:option|string|max:64',
             'value'                => 'required|string|max:64',
             'description'          => 'string'
         ];
