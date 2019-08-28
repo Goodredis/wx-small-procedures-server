@@ -38,9 +38,6 @@ $app->configure('mail');
 // load database configurations
 $app->configure('database');
 
-// load api configurations
-$app->configure('api');
-
 $app->configure('auth');
 
 /*
@@ -108,6 +105,10 @@ $app->register(Dingo\Api\Provider\LumenServiceProvider::class);
 $app->register(App\Providers\DingoServiceProvider::class);
 
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
+
+app('Dingo\Api\Auth\Auth')->extend('jwt', function ($app) {
+    return new Dingo\Api\Auth\Provider\JWT($app['Tymon\JWTAuth\JWTAuth']);
+});
 
 /*
 |--------------------------------------------------------------------------

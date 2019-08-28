@@ -11,6 +11,7 @@ use App\Models\Attendance;
 use App\Models\Attendanceview;
 use App\Models\Staff;
 use App\Models\Contractorder;
+use App\Models\Contractorderquota;
 use App\Models\Dept;
 use App\Models\Option;
 use Illuminate\Support\ServiceProvider;
@@ -23,6 +24,7 @@ use App\Repositories\Contracts\AttendanceRepository;
 use App\Repositories\Contracts\AttendanceviewRepository;
 use App\Repositories\Contracts\StaffRepository;
 use App\Repositories\Contracts\ContractorderRepository;
+use App\Repositories\Contracts\ContractorderquotaRepository;
 use App\Repositories\Contracts\DeptRepository;
 use App\Repositories\Contracts\OptionRepository;
 use App\Repositories\EloquentUserRepository;
@@ -34,6 +36,7 @@ use App\Repositories\EloquentAttendanceRepository;
 use App\Repositories\EloquentAttendanceviewRepository;
 use App\Repositories\EloquentStaffRepository;
 use App\Repositories\EloquentContractorderRepository;
+use App\Repositories\EloquentContractorderquotaRepository;
 use App\Repositories\EloquentDeptRepository;
 use App\Repositories\EloquentOptionRepository;
 
@@ -80,6 +83,9 @@ class RepositoriesServiceProvider extends ServiceProvider
         $this->app->bind(ContractorderRepository::class, function () {
             return new EloquentContractorderRepository(new Contractorder());
         });
+        $this->app->bind(ContractorderquotaRepository::class, function () {
+            return new EloquentContractorderquotaRepository(new Contractorderquota());
+        });
         $this->app->bind(DeptRepository::class, function () {
             return new EloquentDeptRepository(new Dept());
         });
@@ -105,6 +111,7 @@ class RepositoriesServiceProvider extends ServiceProvider
             AttendanceviewRepository::class,
             Staff::class,
             Contractorder::class,
+            Contractorderquota::class,
             Dept::class
         ];
     }

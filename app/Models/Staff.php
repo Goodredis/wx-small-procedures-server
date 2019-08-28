@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Auth\Authenticatable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 
-class Staff extends Model
+class Staff extends Model implements AuthenticatableContract, JWTSubject
 {
+    use Authenticatable;
 
     /**
      * The database table used by the model.
@@ -15,6 +19,14 @@ class Staff extends Model
     protected $table = 'staff';
 
     /**
+     * 设置时间格式
+     */
+    protected $casts = [
+        'created_at' => 'timestamps',
+        'updated_at' => 'timestamps'
+    ];
+
+    /**
      * Storage format of date field
      *
      * @var string
@@ -22,12 +34,19 @@ class Staff extends Model
     protected $dateFormat = 'U';
 
     /**
+     * 定义主键非自增
+     *
+     * @var boolean
+     */
+    public $incrementing = false;
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'uid',
+        'id',
         'name',
         'gender',
         'level',
@@ -36,7 +55,7 @@ class Staff extends Model
         'birthday',
         'idcard',
         'password',
-        'employee_number',
+        'ldap_id',
         'company',
         'position',
         'type',
@@ -69,6 +88,18 @@ class Staff extends Model
 
     public function companydetails() {
         return $this->belongsTo(Supplier::class, 'company', 'code');
+    }
+
+    // jwt 需要实现的方法
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    // jwt 需要实现的方法, 一些自定义的参数
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
     
 }

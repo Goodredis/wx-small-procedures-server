@@ -23,7 +23,7 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
         '出生日期'        =>     'birthday',
         '身份证号'        =>     'idcard',
         '登录密码'        =>     'password',
-        '员工编号'        =>     'employee_number',
+        '员工编号'        =>     'ldap_id',
         '公司名称'        =>     'company',
         '职位'            =>     'position',
         '人员类型'        =>     'type',
@@ -40,9 +40,8 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
      * @inheritdoc
      */
     public function save(array $data) {
-        $data['uid'] = Uuid::uuid4();
         $data['birthday'] = date('Ymd', $data['birthday']);
-        $data['employee_number'] = 'w' . $data['mobile'];
+        $data['ldap_id']  = 'w' . $data['mobile'];
         return parent::save($data);
     }
 
@@ -79,7 +78,7 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
                 $ids = array_pop($ids);
             }
         }
-        $staffs = parent::findBy(array('name' => $names, 'del_flag' => 1), array('del_flag' => '!='))->toArray();
+        $staffs = parent::findBy(array('id' => $ids, 'del_flag' => 1), array('del_flag' => '!='))->toArray();
         return ($flag == true) ? array_pop($staffs['data']) : $staffs['data'];
     }
 
@@ -137,7 +136,7 @@ class EloquentStaffRepository extends AbstractEloquentRepository implements Staf
     }
 
     public function dictionary($keyword) {
-        $staffs = Staff::select('uid', 'name')
+        $staffs = Staff::select('id', 'name')
                         ->where('name', 'like', '%'.$keyword.'%')
                         ->where('status', '=', 1)
                         ->where('del_flag', '!=', 1)

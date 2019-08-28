@@ -25,8 +25,17 @@ $api->version('v1', [
     // 项目初始化测试
     $api->resources([ 'test' => 'TestController' ]);
 
-    // 项目经理的增删改
-    $api->resources([ 'users' => 'UserController' ]);
+    // 登录认证，创建token 
+    $api->post('authorizations', 'AuthController@store');
+    // 用户登出，销毁token 
+    $api->delete('authorizations/current', 'AuthController@delete');
+    // 刷新token 
+    $api->put('authorizations/current', 'AuthController@update');
+
+    $api->group(['middleware' => 'auth'], function ($api) {
+        // 项目经理的增删改
+        $api->resources([ 'users' => 'UserController' ]);
+    });
 
     // 人员考勤的批量操作
     $api->post('attendances/batch', 'AttendanceController@batch');
@@ -36,7 +45,7 @@ $api->version('v1', [
     // 人员管理的数据字典
     $api->get('staffs/dictionary', 'StaffController@dictionary');
     // 人员管理的考勤列表
-    $api->get('staffs/{uid}/attendances', 'StaffController@attendances');
+    $api->get('staffs/{id}/attendances', 'StaffController@attendances');
     // 人员管理的批量操作
     $api->post('staffs/batch', 'StaffController@batch');
     // 人员管理的导入
@@ -46,6 +55,8 @@ $api->version('v1', [
 
     // 合同订单的导入
     $api->post('contractOrders/content', 'ContractorderController@import');
+    // 合同订单分配到项目
+    $api->put('contractOrders/{id}/projects', 'ContractorderController@projects');
     // 合同订单的增删改查
     $api->resources([ 'contractOrders' => 'ContractorderController' ]);
 

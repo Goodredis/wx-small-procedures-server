@@ -70,19 +70,18 @@ class UserController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * Store Request Validation Rules
      *
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return array
      */
-    private function storeRequestValidationRules(Request $request)
-    {
+    private function storeRequestValidationRules(Request $request){
         $rules = [
-            'name'                 => 'max:100|required',
+            'name'                  => 'required|max:255',
         ];
 
         return $rules;
-     }
+    }
 
     /**
      * Display the specified resource.

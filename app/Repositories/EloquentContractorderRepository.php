@@ -2,17 +2,21 @@
 
 namespace App\Repositories;
 
+use Exception;
 use App\Utils\File;
 use App\Utils\Excel;
 use App\Models\Contractorder;
 use App\Models\Framework;
 use App\Models\Dept;
 use App\Models\Supplier;
+use App\Models\Contractorderquota;
 use Illuminate\Database\Eloquent\Model;
 use App\Repositories\Contracts\ContractorderRepository;
 
 class EloquentContractorderRepository extends AbstractEloquentRepository implements ContractorderRepository
 {
+
+    protected $contractOrderQuotaRepository;
 
     //导入的对应字典
     private $format_column = array(
@@ -26,6 +30,7 @@ class EloquentContractorderRepository extends AbstractEloquentRepository impleme
         '税率'     => 'tax_ratio',
         '税后价款' => 'price',
         '含税价款' => 'price_with_tax',
+        '已用额度' => 'used_price',
         '厂商'     => 'supplier_code',
         '框架编号' => 'framework_id',
         '订单状态' => 'status'
@@ -39,13 +44,34 @@ class EloquentContractorderRepository extends AbstractEloquentRepository impleme
         ]
     );
 
+    public function __construct(Model $model) {
+        parent::__construct($model);
+        $this->contractOrderQuotaRepository = new EloquentContractorderquotaRepository(new Contractorderquota());
+    }
+
     /*
      * @inheritdoc
      */
-    public function save(array $data, $generateUidFlag = true) {
+    public function save(array $data) {
+        // 检测已用额度是否超过订单总金额
+        if (isset($data['used_price']) && (intval($data['used_price']) > intval($data['price']))) {
+            throw new Exception(trans('errorCode.160003'), 160003);
+        }
+        // 检测订单负责人是否为订单执行部门下人员
+
+        // 转换截止时间为时间戳格式
         $data['start_date'] = isset($data['start_date']) ? date('Ymd', $data['start_date']) : '';
         $data['end_date'] = isset($data['end_date']) ? date('Ymd', $data['end_date']) : '';
-        return parent::save($data, $generateUidFlag);
+        // 获取供应商code
+        $eloquentFrameworkRepository = new EloquentFrameworkRepository(new Framework());
+        $framework_info = $eloquentFrameworkRepository->findOne($data['framework_id'])->toArray();
+        $data['supplier_code'] = $framework_info['supplier_code'];
+        // 插入合同订单表
+        $order = parent::save($data);
+        // 插入合同订单配额表
+        $orderQuotaData = $this->arrangeOrderQuotaSysData($order->id, $data);
+        $this->contractOrderQuotaRepository->save($orderQuotaData);
+        return $order;
     }
 
     /**
@@ -53,13 +79,38 @@ class EloquentContractorderRepository extends AbstractEloquentRepository impleme
      */
     public function update(Model $model, array $data)
     {
+        // 检测已用额度是否超过订单总金额
+        if (isset($data['used_price']) && (intval($data['used_price']) > intval($data['price']))) {
+            throw new Exception(trans('errorCode.160003'), 160003);
+        }
+        // 检测订单负责人是否为订单执行部门下人员
+
+        // 如果存在 则转换 否之则不动
         if (isset($data['start_date'])) {
             $data['start_date'] = date('Ymd', $data['start_date']);
         }
         if (isset($data['end_date'])) {
             $data['end_date'] = date('Ymd', $data['end_date']);
-        }  
-        return parent::update($model, $data);
+        }
+        // 如果框架合同变更 则同时变更供应商code
+        $order_info = $model->toArray();
+        if ($data['framework_id'] != $order_info['framework_id']) {
+            $eloquentFrameworkRepository = new EloquentFrameworkRepository(new Framework());
+            $framework_info = $eloquentFrameworkRepository->findOne($data['framework_id'])->toArray();
+            $data['supplier_code'] = $framework_info['supplier_code'];
+        }
+
+        // 更新合同订单表
+        $order = parent::update($model, $data);
+        // 更新合同订单配额表
+        $criteria = array('contract_order_id' => $order->id, 'parent_project_id' => '');
+        $order_quota = $this->contractOrderQuotaRepository->findOneBy($criteria);
+        if (empty($order_quota)) {
+            throw new Exception(trans('errorCode.160004'), 160004);
+        }
+        $orderQuotaData = $this->arrangeOrderQuotaSysData($order->id, $data);
+        $this->contractOrderQuotaRepository->update($order_quota, $orderQuotaData);
+        return $order;
     }
 
 	/**
@@ -106,10 +157,22 @@ class EloquentContractorderRepository extends AbstractEloquentRepository impleme
     }
 
     /**
-     * @brief  删除单条合同订单--逻辑删除
+     * @brief  删除单条合同订单
      */
     public function delete(Model $model){
-        return parent::update($model, ['del_flag' => 1]);
+        // 删除合同订单信息--逻辑删除
+        $order = parent::update($model, ['del_flag' => 1]);
+        // 删除相关订单配额信息--物理删除
+        $criteria = array('contract_order_id' => $model->id, 'columns' => 'id');
+        $order_quota = $this->contractOrderQuotaRepository->findBy($criteria);
+        if (empty($order_quota)) {
+            throw new Exception(trans('errorCode.160004'), 160004);
+        }
+        $ids = $order_quota->transform(function ($value, $key) {
+            return $value->id;
+        });
+        $this->contractOrderQuotaRepository->destroy($ids->toArray());
+        return $order;
     }
 
     /**
@@ -190,6 +253,29 @@ class EloquentContractorderRepository extends AbstractEloquentRepository impleme
         //删除文档
         unlink($file_path);
         return true;
+    }
+
+    /**
+     * 合同订单配额同步数据
+     */
+    private function arrangeOrderQuotaSysData($contract_order_id, $data) {
+        $orderQuotaData = array();
+        if (empty($contract_order_id)){
+            throw new Exception(trans('errorCode.160001'), 160001);
+        }
+        if (!isset($data['project_id']) || empty($data['project_id'])){
+            throw new Exception(trans('errorCode.160002'), 160002);
+        }
+        $orderQuotaData['contract_order_id'] = trim($contract_order_id);
+        $orderQuotaData['signer']     = trim($data['signer']);
+        $orderQuotaData['project_id'] = trim($data['project_id']);
+        $orderQuotaData['parent_project_id'] = isset($data['parent_project_id']) ? trim($data['parent_project_id']) : '';
+        $orderQuotaData['tax_ratio']  = intval($data['tax_ratio']);
+        $used_price = isset($data['used_price']) ? intval($data['used_price']) : 0;
+        $price = intval($data['price']) - $used_price;
+        $orderQuotaData['price'] = round($price, 2);
+        $orderQuotaData['price_with_tax'] = round($price * (intval($data['tax_ratio'])/100+1), 2);
+        return $orderQuotaData;
     }
 
 }

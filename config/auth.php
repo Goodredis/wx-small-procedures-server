@@ -2,7 +2,7 @@
 
 return [
     'defaults' => [
-        'guard' => 'api',
+        'guard' => 'staff_api',
         'passwords' => 'users',
     ],
 
@@ -24,7 +24,7 @@ return [
         ],
         'staff' => [
             'driver' => 'eloquent',
-            'model' => \App\Models\User::class
+            'model' => \App\Models\Staff::class
         ]
     ]
 ];

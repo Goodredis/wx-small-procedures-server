@@ -66,12 +66,18 @@ class StaffController extends Controller
      */
 	public function index(Request $request) {
         $requestData = $request->all();
+        $output = 'json';
+        if (isset($requestData['output']) && !empty($requestData['output'])) {
+            $output = $requestData['output'];
+            unset($requestData['output']);
+        }
         $staffs = $this->staffRepository->findBy($requestData);
-        $output = isset($requestData['output']) ? $requestData['output'] : 'json';
         if ($output == 'json') {
             return $this->respondWithCollection($staffs, $this->staffTransformer);
         } elseif ($output == 'excel') {
             # code...
+        } else {
+            return $this->sendCustomResponse(400, 'Error bad parameter format on batch of Attendance');
         }
 	}
 
@@ -82,7 +88,7 @@ class StaffController extends Controller
      * @return \Illuminate\Http\JsonResponse|string
      */
     public function show($id) {
-        $staff = $this->staffRepository->getStaffItemById(intval($id));
+        $staff = $this->staffRepository->getStaffItemById($id);
 
         if (!$staff instanceof Staff) {
             return $this->sendNotFoundResponse("The staff with id {$id} doesn't exist");
@@ -182,8 +188,8 @@ class StaffController extends Controller
      * @param  string
      * @return array
      */
-    public function attendances($uid) {
-        $attendances = $this->attendanceviewRepository->getAttendanceviewList(array('uid' => $uid));
+    public function attendances($id) {
+        $attendances = $this->attendanceviewRepository->getAttendanceviewList(array('uid' => $id));
         return $this->respondWithCollection($attendances, $this->attendanceviewTransformer);
     }
 
@@ -223,7 +229,7 @@ class StaffController extends Controller
             'birthday'              => 'max:11',
             'idcard'                => 'max:18',
             'password'              => 'max:64',
-            'employee_number'       => 'max:12',
+            'ldap_id'               => 'max:12',
             'company'               => 'max:64',
             'position'              => 'max:64',
             'type'                  => 'max:1',
@@ -253,7 +259,7 @@ class StaffController extends Controller
             'birthday'              => 'max:11',
             'idcard'                => 'max:18',
             'password'              => 'max:64',
-            'employee_number'       => 'max:12',
+            'ldap_id'               => 'max:12',
             'company'               => 'max:64',
             'position'              => 'max:64',
             'type'                  => 'max:1',
