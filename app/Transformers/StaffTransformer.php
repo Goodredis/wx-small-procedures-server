@@ -20,7 +20,7 @@ class StaffTransformer extends TransformerAbstract
             'email'                 => $staff->email,
             'birthday'              => strtotime($staff->birthday),
             'idcard'                => $staff->idcard,
-            'employee_number'       => $staff->employee_number,
+            'ldap_id'               => $staff->ldap_id,
             'position'              => $staff->position,
             'type'                  => intval($staff->type),
             'label'                 => $staff->label,

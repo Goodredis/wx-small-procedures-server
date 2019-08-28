@@ -51,7 +51,7 @@ class Staff extends Model
         'birthday',
         'idcard',
         'password',
-        'employee_number',
+        'ldap_id',
         'company',
         'position',
         'type',
