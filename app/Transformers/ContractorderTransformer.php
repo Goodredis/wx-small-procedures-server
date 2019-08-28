@@ -34,6 +34,6 @@ class ContractorderTransformer extends TransformerAbstract
     }
 
     public function includeFramework(Contractorder $contractorder) {
-        return $this->item($contractorder->frameworkInfo, new FrameworkTransformer());
+        return $this->item($contractorder->frameworkInfo, new FrameworkTransformer(), 'include');
     }
 }

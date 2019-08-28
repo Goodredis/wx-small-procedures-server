@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
+use App\Foundations\Fractal\NoDataArraySerializer;
 
 class Controller extends BaseController
 {
@@ -18,6 +19,7 @@ class Controller extends BaseController
     public function __construct(Manager $fractal = null)
     {
         $fractal = $fractal === null ? new Manager() : $fractal;
+        $fractal->setSerializer(new NoDataArraySerializer);//设置序列化器
         $this->setFractal($fractal);
     }
 

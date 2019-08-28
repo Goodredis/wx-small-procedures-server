@@ -30,6 +30,6 @@ class AttendanceviewTransformer extends TransformerAbstract
     public function includeStaff(Attendanceview $attendanceview) {
         $staffTransformer = new StaffTransformer();
         $staffTransformer = $staffTransformer->setDefaultIncludes(['company']);
-        return $this->item($attendanceview->staff, $staffTransformer);
+        return $this->item($attendanceview->staff, $staffTransformer, 'include');
     }
 }

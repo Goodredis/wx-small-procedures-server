@@ -35,6 +35,6 @@ class SupplierTransformer extends TransformerAbstract
         $framework = $supplier->framework;
         $frameworkTransformer = new FrameworkTransformer();
         $frameworkTransformer = $frameworkTransformer -> setDefaultIncludes(['details']);
-        return $this->collection($framework, $frameworkTransformer);
+        return $this->collection($framework, $frameworkTransformer,'include');
     }
 }

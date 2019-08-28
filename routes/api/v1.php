@@ -78,4 +78,7 @@ $api->version('v1', [
     $api->post('depts/content', 'DeptController@import');
     //部所的增查
     $api->resources([ 'depts' => 'DeptController' ]);
+
+    //配置字典的增查
+    $api->resources([ 'options' => 'OptionController' ]);
 });

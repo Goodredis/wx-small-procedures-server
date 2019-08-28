@@ -29,6 +29,6 @@ class AttendanceTransformer extends TransformerAbstract
     }
 
     public function includeStaff(Attendance $attendance) {
-        return $this->item($attendance->staff, new StaffTransformer());
+        return $this->item($attendance->staff, new StaffTransformer(), 'include');
     }
 }
