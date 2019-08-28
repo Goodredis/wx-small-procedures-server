@@ -55,8 +55,14 @@ $api->version('v1', [
 
     // 合同订单的导入
     $api->post('contractOrders/content', 'ContractorderController@import');
+    // 获取合同订单负责人
+    $api->get('contractOrders/{id}/managers', 'ContractorderController@getOrderManagers');
+    // 变更合同订单负责人
+    $api->get('contractOrders/{id}/managers', 'ContractorderController@setOrderManagers');
+    // 获取合同订单项目记录
+    $api->get('contractOrders/{id}/projects', 'ContractorderController@getprojectsfromorder');
     // 合同订单分配到项目
-    $api->put('contractOrders/{id}/projects', 'ContractorderController@projects');
+    $api->put('contractOrders/{id}/projects', 'ContractorderController@assignordertoprojects');
     // 合同订单的增删改查
     $api->resources([ 'contractOrders' => 'ContractorderController' ]);
 

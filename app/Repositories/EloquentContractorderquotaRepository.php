@@ -34,10 +34,33 @@ class EloquentContractorderquotaRepository extends AbstractEloquentRepository im
     }
 
     /**
-     * @inheritdoc
+     * @brief 批量更新
      */
-    public function findBy(array $searchCriteria = [], array $operatorCriteria = []) {
-        return parent::findBy($searchCriteria, $operatorCriteria);
+    public function updateBatch(array $data) {
+        foreach ($data as $key => $value) {
+            $quota = parent::findOne($value['id']);
+            if (!$quota instanceof Contractorderquota) {
+                throw new Exception(trans('errorCode160007'), 160007);
+            }
+            $this->update($quota, $value);
+        }
+    }
+
+    /**
+     * @brief 获取合同订单项目记录
+     * @param Request $request
+     * @param string  $id
+     * @return collection
+     */
+    public function getProjectsFromOrder($id, array $criteria = []) {
+        // 初始化where条件
+        $searchCriteria['contract_order_id'] = $id;
+        $searchCriteria['parent_project_id'] = '';
+        $operatorCriteria['parent_project_id'] = '!=';
+        // 初始化order条件
+        $searchCriteria['orderby'] = isset($criteria['created_at']) ? trim($criteria['created_at']) : 'created_at';
+        $quotas = parent::findBy($searchCriteria, $operatorCriteria)->toArray();
+        return $quotas['data'];
     }
 
     /**
@@ -55,62 +78,89 @@ class EloquentContractorderquotaRepository extends AbstractEloquentRepository im
     }
 
     /**
-     * 合同订单配额分配(全量)
+     * @brief  合同订单配额分配(全量)
      * @param  string $id
      * @param  array  $criteria
      * @return
      */
     public function assignOrderToProjects($id, array $criteria) {
-        // Step.01  校验数据完整性
-        $new_quotas = $this->filterQuotasData($criteria);
-        if (isset($new_quotas['error'])) return $new_quotas;
-        // Step.02  取出已分配数据
-        $old_quotas = $this->findBy(array('contract_order_id' => $id, 'parent_project_id' => ''), array('parent_project_id' => '!='))->toArray();
-        // Step.03  开始配额分配
-        if (empty($old_quotas['data'])) {
+        set_time_limit(0);
+        // Step.01  取出已分配数据
+        $old_quotas = $this->getProjectsFromOrder($id);
+        // Step.02  开始配额分配
+        if (empty($old_quotas)) {
             // insert
+            // 校验数据完整性
+            $new_quotas = $this->filterQuotasData($criteria);
+            if (isset($new_quotas['error'])) return $new_quotas;
+            // 校验分配金额是否合理
             $this->checkAssignPrice($id, array_values(array_column($new_quotas, 'price')));
+            // 批量插入
             Contractorderquota::insert($new_quotas);
         } else {
-            // update
-            echo 2;exit;
+            // update            
+            // 数据集中处理
+            $quotas = $this->centralizeArrangeData($criteria, $old_quotas);
+            while ($quotas) {
+                switch (true) {
+                    case array_key_exists('insert', $quotas):
+                        $new_quotas = $this->filterQuotasData(array_pop($quotas));
+                        Contractorderquota::insert($new_quotas);
+                        break;
+                    case array_key_exists('update', $quotas):
+                        $new_quotas = $this->filterQuotasData(array_pop($quotas), false);
+                        // @todo 如果该子项目已报工、则分配金额必须大于已报工总金额
+                        $this->updateBatch($new_quotas);
+                        break;
+                    case array_key_exists('delete', $quotas):
+                        // @todo 如果该子项目已报工则无法删除
+                        $this->destroy(array_pop($quotas));
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
+                if (isset($new_quotas['error'])) return $new_quotas;
+            }
         }
-        // Step.04  检测已分配配额是否超支
-        // Step.05  return
-        return $this->findBy(array('contract_order_id' => $id, 'parent_project_id' => ''), array('parent_project_id' => '!='))->toArray();
+        // Step.03  检测已分配配额是否超支
+        // Step.04  return
+        return $this->getProjectsFromOrder($id);
     }
 
     /**
-     * 过滤配额数据
+     * @brief  过滤配额数据
      */
-    private function filterQuotasData($data) {
+    private function filterQuotasData($data, $flag = true) {
         $time = time();
         $data = array_values($data);
         $columns = array('contract_order_id', 'signer', 'project_id', 'parent_project_id', 'tax_ratio', 'price', 'price_with_tax');
         for ($i=0; $i < count($data); $i++) { 
-            $diffData = array_diff_assoc($columns, array_keys($data[$i]));
+            $diffData = array_diff($columns, array_keys($data[$i]));
             if (!empty($diffData)) {
-                $message = "Not found " . implode(',', array_values($diffData)) . "in the" . $data[$i]['project_id'];
+                $message = "Not found " . implode(',', array_values($diffData)) . " in the " . $data[$i]['project_id'];
                 return array('err_code' => '', 'message' => $message);
             }
             for ($j=0; $j < count($columns); $j++) { 
                 if (empty($data[$i][$columns[$j]])) {
-                    $message = "Empty string of the parameter " . $columns[$j] . "in the" . $data[$i]['project_id'];
+                    $message = "Empty string of the parameter " . $columns[$j] . " in the " . $data[$i]['project_id'];
                     return array('err_code' => '', 'message' => $message);
                 }
             }
             $checkQuotaData = $this->checkQuotaData($data[$i]);
             if (isset($checkQuotaData['error'])) return $checkQuotaData;
-            // fefault value
+            // default value
+            if ($flag) {
+                $data[$i]['created_at'] = $time;
+                $data[$i]['updated_at'] = $time;
+            }
             $data[$i]['status'] = 1;
-            $data[$i]['created_at'] = $time;
-            $data[$i]['updated_at'] = $time;
         }
         return $data;
     }
 
     /**
-     * 校验有效数据
+     * @brief  校验有效数据
      */
     private function checkQuotaData($item) {
         // 校验该条订单是否执行ing
@@ -124,7 +174,9 @@ class EloquentContractorderquotaRepository extends AbstractEloquentRepository im
         // 校验该条父项目是否已开题或者已结项
     }
 
-
+    /**
+     * @brief  校验分配金额
+     */
     private function checkAssignPrice($id, $prices) {
         $model = new EloquentContractorderRepository(new Contractorder());
         $order_info = $model->getContractOrderInfoById($id)->toArray();
@@ -139,6 +191,33 @@ class EloquentContractorderquotaRepository extends AbstractEloquentRepository im
         if (array_sum($prices) > ($all_price-$used_price-$parent_project_price)) {
             throw new Exception(trans('errorCode.160005'), 160005);
         }
+    }
+
+    /**
+     * @brief  数据集中处理
+     * @param  array  new_data
+     * @param  array  old_data
+     * @param  array  quotas
+     */
+    private function centralizeArrangeData($new_data, $old_data) {
+        $contract_order_id = $new_data[0]['contract_order_id'];
+        $quotas = array('delete' => [], 'update' => [], 'insert' => []);
+        if (empty($new_data) || empty($old_data)) {
+            throw new Exception(trans('errorCode.160006'), 160006);
+        }
+        $new_ids = array_values(array_unique(array_column($new_data, 'id')));
+        $old_ids = array_values(array_unique(array_column($old_data, 'id')));
+        $quotas['delete'] = array_diff($old_ids, $new_ids);
+        foreach ($new_data as $value) {
+            if (!array_key_exists('id', $value)) {
+                $quotas['insert'][] = $value;
+            } else {
+                $quotas['update'][] = $value;
+            }
+        }
+        // 校验分配金额是否合理
+        $this->checkAssignPrice($contract_order_id, array_merge(array_values(array_column($quotas['insert'], 'price')), array_values(array_column($quotas['update'], 'price'))));
+        return $quotas;
     }
 
 }

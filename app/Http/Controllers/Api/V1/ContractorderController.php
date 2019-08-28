@@ -164,45 +164,66 @@ class ContractorderController extends Controller
         return response(null, 204);
     }
 
+    public function getOrderManagers($id) {
+        # code...
+    }
+
+    public function setOrderManagers($id, $managers) {
+        # code...
+    }
+
+    /**
+     * 获取合同订单项目记录
+     * @param Request $request
+     * @param string  $id
+     * @return collection
+     */
+    public function getprojectsfromorder(Request $request, $id) {
+        $quotas = $this->contractorderquotaRepository->getProjectsFromOrder($id, $request->all());
+        return response()->json($quotas);
+    }
+
     /**
      * 合同订单分配到项目
      * @param Request $request
      * @param string  $id
      * @return collection
      */
-    public function projects(Request $request, $id) {
-        $requestData = array(
-            array(
-                'contract_order_id'  =>  'dda62df8-5cff-4574-be1f-e146a902f081',
-                'signer'             =>  'signer1',
-                'project_id'         =>  'sub1',
-                'parent_project_id'  =>  '16632ea1-1758-4533-be27-19765fecefaa',
-                'tax_ratio'          =>  '6',
-                'price'              =>  '500000',
-                'price_with_tax'     =>  '530000',
-            ),
-            array(
-                'contract_order_id'  =>  'dda62df8-5cff-4574-be1f-e146a902f081',
-                'signer'             =>  'signer2',
-                'project_id'         =>  'sub2',
-                'parent_project_id'  =>  '16632ea1-1758-4533-be27-19765fecefaa',
-                'tax_ratio'          =>  '6',
-                'price'              =>  '200000',
-                'price_with_tax'     =>  '212000',
-            ),
-            array(
-                'contract_order_id'  =>  'dda62df8-5cff-4574-be1f-e146a902f081',
-                'signer'             =>  'signer3',
-                'project_id'         =>  'sub3',
-                'parent_project_id'  =>  '16632ea1-1758-4533-be27-19765fecefaa',
-                'tax_ratio'          =>  '6',
-                'price'              =>  '200000',
-                'price_with_tax'     =>  '212000',
-            ),
-        );
-        // $requestData = $request->all();
+    public function assignordertoprojects(Request $request, $id) {
+        // $requestData = array(
+        //     array(
+        //         'id'                 =>  30,
+        //         'contract_order_id'  =>  'dda62df8-5cff-4574-be1f-e146a902f081',
+        //         'signer'             =>  'signer1',
+        //         'project_id'         =>  'sub1',
+        //         'parent_project_id'  =>  '16632ea1-1758-4533-be27-19765fecefaa',
+        //         'tax_ratio'          =>  '6',
+        //         'price'              =>  '500000',
+        //         'price_with_tax'     =>  '530000',
+        //     ),
+        //     array(
+        //         'id'                 =>  31,
+        //         'contract_order_id'  =>  'dda62df8-5cff-4574-be1f-e146a902f081',
+        //         'signer'             =>  'signer2',
+        //         'project_id'         =>  'sub2',
+        //         'parent_project_id'  =>  '16632ea1-1758-4533-be27-19765fecefaa',
+        //         'tax_ratio'          =>  '6',
+        //         'price'              =>  '200000',
+        //         'price_with_tax'     =>  '212000',
+        //     ),
+        //     array(
+        //         'contract_order_id'  =>  'dda62df8-5cff-4574-be1f-e146a902f081',
+        //         'signer'             =>  'signer3',
+        //         'project_id'         =>  'sub3',
+        //         'parent_project_id'  =>  '16632ea1-1758-4533-be27-19765fecefaa',
+        //         'tax_ratio'          =>  '6',
+        //         'price'              =>  '200000',
+        //         'price_with_tax'     =>  '212000',
+        //     ),
+        // );
+        $requestData = $request->all();
         $ret = $this->contractorderquotaRepository->assignOrderToProjects($id, $requestData);
-        return isset($ret['err_code']) ? $this->sendCustomResponse(400, $ret['message']) : $this->respondWithArray($ret['data']);
+        return isset($ret['err_code']) ? $this->sendCustomResponse(400, $ret['message']) : response()->json($ret);
     }
 
     /**
