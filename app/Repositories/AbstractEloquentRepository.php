@@ -88,6 +88,11 @@ abstract class AbstractEloquentRepository implements BaseRepository
         $queryBuilder = $this->model->where(function ($query) use ($searchCriteria, $operatorCriteria) {
 
             $this->applySearchCriteriaInQueryBuilder($query, $searchCriteria, $operatorCriteria);
+
+            $query->whereHas('staff', function ($query) {
+                $query->where('company', '=', '87664096-611f-406a-878e-51e59956c090');
+
+            });
         });
 
         $queryBuilder = $this->applyOrderCriteriaInQueryBuilder($queryBuilder, $orderby);

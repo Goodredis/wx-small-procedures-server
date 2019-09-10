@@ -58,7 +58,7 @@ class EloquentContractorderquotaRepository extends AbstractEloquentRepository im
         $searchCriteria['parent_project_id'] = '';
         $operatorCriteria['parent_project_id'] = '!=';
         // 初始化order条件
-        $searchCriteria['orderby'] = isset($criteria['created_at']) ? trim($criteria['created_at']) : 'created_at';
+        $searchCriteria['orderby'] = isset($criteria['orderby']) ? trim($criteria['orderby']) : 'created_at';
         $quotas = parent::findBy($searchCriteria, $operatorCriteria)->toArray();
         return $quotas['data'];
     }
@@ -92,7 +92,7 @@ class EloquentContractorderquotaRepository extends AbstractEloquentRepository im
             // insert
             // 校验数据完整性
             $new_quotas = $this->filterQuotasData($criteria);
-            if (isset($new_quotas['error'])) return $new_quotas;
+            if (isset($new_quotas['err_code'])) return $new_quotas;
             // 校验分配金额是否合理
             $this->checkAssignPrice($id, array_values(array_column($new_quotas, 'price')));
             // 批量插入
@@ -120,7 +120,7 @@ class EloquentContractorderquotaRepository extends AbstractEloquentRepository im
                         # code...
                         break;
                 }
-                if (isset($new_quotas['error'])) return $new_quotas;
+                if (isset($new_quotas['err_code'])) return $new_quotas;
             }
         }
         // Step.03  检测已分配配额是否超支
@@ -148,7 +148,7 @@ class EloquentContractorderquotaRepository extends AbstractEloquentRepository im
                 }
             }
             $checkQuotaData = $this->checkQuotaData($data[$i]);
-            if (isset($checkQuotaData['error'])) return $checkQuotaData;
+            if (isset($checkQuotaData['err_code'])) return $checkQuotaData;
             // default value
             if ($flag) {
                 $data[$i]['created_at'] = $time;
