@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Order;
 use App\Models\User;
 use App\Models\Test;
+use App\Repositories\Contracts\OrderRepository;
+use App\Repositories\EloquentOrderRepository;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\Contracts\UserRepository;
 use App\Repositories\Contracts\TestRepository;
@@ -31,6 +34,9 @@ class RepositoriesServiceProvider extends ServiceProvider
         });
         $this->app->bind(TestRepository::class, function () {
             return new EloquentTestRepository(new Test());
+        });
+        $this->app->bind(OrderRepository::class, function () {
+           return new EloquentOrderRepository(new Order());
         });
     }
 
