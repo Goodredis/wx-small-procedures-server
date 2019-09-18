@@ -33,10 +33,7 @@ $api->version('v1', [
     $api->put('authorizations/current', 'AuthController@update');
 
     $api->group(['middleware' => 'auth'], function ($api) {
-        // 项目经理的增删改
-        $api->resources([ 'users' => 'UserController' ]);
+        // 用户预约
+        $api->resources([ 'order' => 'OrderController' ]);
     });
-
-    // 用户预约
-    $api->resources([ 'order' => 'OrderController' ]);
 });

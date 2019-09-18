@@ -50,6 +50,7 @@ class RepositoriesServiceProvider extends ServiceProvider
         return [
             UserRepository::class,
             TestRepository::class,
+            OrderRepository::class
         ];
     }
 }

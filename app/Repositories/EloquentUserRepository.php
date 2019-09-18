@@ -14,11 +14,6 @@ class EloquentUserRepository extends AbstractEloquentRepository implements UserR
      */
     public function save(array $data)
     {
-        // update password
-        if (isset($data['password'])) {
-            $data['password'] = Hash::make($data['password']);
-        }
-
         $user = parent::save($data);
 
         return $user;
@@ -29,13 +24,22 @@ class EloquentUserRepository extends AbstractEloquentRepository implements UserR
      */
     public function update(Model $model, array $data)
     {
-        if (isset($data['password'])) {
-            $data['password'] = Hash::make($data['password']);
+        $fillAbleProperties = $this->model->getFillable();
+
+        foreach ($data as $key => $value) {
+
+            // update only fillAble properties
+            if (in_array($key, $fillAbleProperties)) {
+                $model->$key = $value;
+            }
         }
 
-        $updatedUser = parent::update($model, $data);
+        // update the model
+        $model->save();
+        // get updated model from database
+        $model = $this->findOne($model->openid);
 
-        return $updatedUser;
+        return $model;
     }
 
     /**
@@ -51,10 +55,6 @@ class EloquentUserRepository extends AbstractEloquentRepository implements UserR
      */
     public function findOne($id)
     {
-        if ($id === 'me') {
-            return $this->getLoggedInUser();
-        }
-
-        return parent::findOne($id);
+        return $this->findOneBy(['openid' => $id]);
     }
 }

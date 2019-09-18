@@ -40,7 +40,7 @@ class Authenticate
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if ($this->auth->guard('api')->guest() && $this->auth->guard('staff_api')->guest()) {
+        if ($this->auth->guard('api')->guest()) {
             return response()->json((['status' => 401, 'message' => 'Unauthorized']), 401);
         }
 

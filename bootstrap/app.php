@@ -40,6 +40,7 @@ $app->configure('database');
 
 $app->configure('auth');
 
+class_alias('Ixudra\Curl\Facades\Curl', 'Curl');
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
@@ -105,6 +106,7 @@ $app->register(Dingo\Api\Provider\LumenServiceProvider::class);
 $app->register(App\Providers\DingoServiceProvider::class);
 
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
+$app->register(Ixudra\Curl\CurlServiceProvider::class);
 
 app('Dingo\Api\Auth\Auth')->extend('jwt', function ($app) {
     return new Dingo\Api\Auth\Provider\JWT($app['Tymon\JWTAuth\JWTAuth']);

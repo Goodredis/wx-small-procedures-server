@@ -192,7 +192,6 @@ abstract class AbstractEloquentRepository implements BaseRepository
 
         // update the model
         $model->save();
-
         // get updated model from database
         $model = $this->findOne($model->id);
 

@@ -16,7 +16,7 @@ class User extends Model implements AuthenticatableContract, JWTSubject
      *
      * @var string
      */
-    protected $table = 'users';
+    protected $table = 'order_users';
 
     /**
      * Storage format of date field
@@ -28,12 +28,7 @@ class User extends Model implements AuthenticatableContract, JWTSubject
     /**
      * 定义主键非自增
      */
-    public $incrementing = false;
-
-    /**
-     * 定义常量,标记是研究院员工 
-     */
-    public $actor = 'user';
+//    public $incrementing = false;
 
     /**
      * The attributes that are mass assignable.
@@ -41,26 +36,21 @@ class User extends Model implements AuthenticatableContract, JWTSubject
      * @var array
      */
     protected $fillable = [
-        'id',
-        'name',
-        'password',
-        'gender',
-        'mobile',
-        'email',
-        'avatar',
-        'employee_number',
-        'order',
-        'ldap_id',
-        'org_code',
-        'status'
+        'openid',
+        'session_key',
+        'status',
+        'del_flag'
     ];
 
     /**
-     * 获取组织部所
+     * 定义默认字段
+     *
+     * @var array
      */
-    public function org(){
-        return $this->belongsTo('App\Models\Org', 'org_code', 'code');
-    }
+    protected $attributes = [
+        'status' => 0,
+        'del_flag' => 0
+    ];
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -68,7 +58,7 @@ class User extends Model implements AuthenticatableContract, JWTSubject
      * @var array
      */
     protected $hidden = [
-        'password',
+        'session_key',
     ];
 
     // jwt 需要实现的方法

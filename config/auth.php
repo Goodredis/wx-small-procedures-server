@@ -2,7 +2,7 @@
 
 return [
     'defaults' => [
-        'guard' => 'staff_api',
+        'guard' => 'api',
         'passwords' => 'users',
     ],
 
@@ -10,21 +10,13 @@ return [
         'api' => [
             'driver' => 'jwt',
             'provider' => 'users',
-        ],
-        'staff_api' => [
-            'driver' => 'jwt',
-            'provider' => 'staff',
-        ],
+        ]
     ],
 
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
             'model' => \App\Models\User::class
-        ],
-        'staff' => [
-            'driver' => 'eloquent',
-            'model' => \App\Models\Staff::class
         ]
     ]
 ];
